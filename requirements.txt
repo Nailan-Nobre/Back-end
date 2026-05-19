@@ -1,0 +1,5 @@
+Flask==3.1.1
+flask-cors==5.0.0
+qrcode==8.2
+Pillow==10.4.0
+gunicorn==22.0.0

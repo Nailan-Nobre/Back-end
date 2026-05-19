@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: presenca-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn api:app --workers 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FRONTEND_URL
+        value: https://SEU-PROJETO.vercel.app   # ← troque pelo domínio real do Vercel
+      - key: DB_PATH
+        value: /opt/render/project/src/controle_presenca.db
+      - key: QR_VALID_SECONDS
+        value: "30"
+      - key: PRESENCA_PATH
+        value: /presenca.html
