@@ -27,7 +27,7 @@ def inicializar_banco() -> psycopg.Connection:
 
 def get_conexao() -> psycopg.Connection:
     """Retorna a conexão ativa. Garante que o banco foi inicializado."""
-    if _conexao is None:
+    if _conexao is None or _conexao.closed:
         return inicializar_banco()
     return _conexao
 

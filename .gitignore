@@ -3,3 +3,5 @@ __pycache__/bd.cpython-314.pyc
 backend/__pycache__/bd.cpython-312.pyc
 backend/schema.sql
 backend/.env
+backend/__pycache__/config.cpython-312.pyc
+backend/__pycache__/qr.cpython-312.pyc
