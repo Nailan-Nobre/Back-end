@@ -105,5 +105,39 @@ def qr_config():
     return jsonify({"valid_seconds": qr.VALID_SECONDS})
 
 
+@app.route("/presencas", methods=["GET"])
+def listar_presencas():
+    data_param = request.args.get("data")
+    if data_param:
+        try:
+            data_consulta = datetime.date.fromisoformat(data_param)
+        except ValueError:
+            return jsonify({"erro": "data inválida. Use YYYY-MM-DD"}), 400
+    else:
+        data_consulta = datetime.date.today()
+
+    conn = bd.get_conexao()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT a.nome, a.matricula, p.hora_registro
+        FROM presencas p
+        JOIN alunos a ON a.id = p.aluno_id
+        WHERE p.data_aula = ?
+        ORDER BY p.hora_registro DESC
+        """,
+        (data_consulta,),
+    )
+    registros = [
+        {
+            "nome": row[0],
+            "matricula": row[1],
+            "hora_registro": row[2],
+        }
+        for row in cursor.fetchall()
+    ]
+    return jsonify({"data": data_consulta.isoformat(), "registros": registros})
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
