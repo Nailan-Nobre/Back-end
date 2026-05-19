@@ -22,14 +22,14 @@ def gerar_novo_qrcode_sala(
     valid_seconds: int = VALID_SECONDS,
 ) -> Tuple[str, bytes]:
     token = secrets.token_hex(16)
-    agora = datetime.datetime.now()
+    agora = datetime.datetime.now(datetime.timezone.utc)
     expiracao = agora + datetime.timedelta(seconds=valid_seconds)
 
     conn = bd.get_conexao()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO tokens_qrcode (token_gerado, expira_em) VALUES (?, ?)",
-        (token, expiracao.strftime('%Y-%m-%d %H:%M:%S'))
+        "INSERT INTO tokens_qrcode (token_gerado, expira_em) VALUES (%s, %s)",
+        (token, expiracao)
     )
     conn.commit()
 

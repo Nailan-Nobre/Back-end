@@ -1,70 +1,31 @@
 import os
-import sqlite3
 from typing import Optional
 
+from dotenv import load_dotenv
+import psycopg
+from psycopg.rows import dict_row
+
+load_dotenv()
+
 # ---------------------------------------------------------------------------
-# Caminho do banco lido de variável de ambiente.
-# No Render, defina: DB_PATH=/opt/render/project/src/controle_presenca.db
-# Localmente, o padrão 'controle_presenca.db' já funciona.
+# Conexao Postgres (Supabase) lida de variavel de ambiente.
+# Use DATABASE_URL ou SUPABASE_DB_URL no .env/Render.
 # ---------------------------------------------------------------------------
-DB_PATH = os.environ.get("DB_PATH", "controle_presenca.db")
+DB_URL = os.environ.get("DATABASE_URL") or os.environ.get("SUPABASE_DB_URL")
+if not DB_URL:
+    raise RuntimeError("DATABASE_URL ou SUPABASE_DB_URL nao configurado")
 
-# Conexão global reutilizada por toda a aplicação
-_conexao: Optional[sqlite3.Connection] = None
+# Conexao global reutilizada por toda a aplicacao
+_conexao: Optional[psycopg.Connection] = None
 
 
-def inicializar_banco() -> sqlite3.Connection:
+def inicializar_banco() -> psycopg.Connection:
     global _conexao
-    _conexao = sqlite3.connect(DB_PATH, check_same_thread=False)
-    _conexao.row_factory = sqlite3.Row
-
-    # Performance e integridade
-    _conexao.execute("PRAGMA foreign_keys = ON;")
-    _conexao.execute("PRAGMA journal_mode = WAL;")
-    _conexao.execute("PRAGMA synchronous = NORMAL;")
-    _conexao.execute("PRAGMA cache_size = -32000;")  # ~32 MB de cache
-
-    cursor = _conexao.cursor()
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS alunos (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome         TEXT NOT NULL,
-            matricula    TEXT UNIQUE NOT NULL,
-            senha_hash   TEXT NOT NULL
-        );
-    ''')
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS tokens_qrcode (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            token_gerado TEXT UNIQUE NOT NULL,
-            data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-            expira_em    DATETIME NOT NULL,
-            utilizado    INTEGER DEFAULT 0
-        );
-    ''')
-
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS presencas (
-            id             INTEGER PRIMARY KEY AUTOINCREMENT,
-            aluno_id       INTEGER,
-            data_aula      DATE NOT NULL,
-            hora_registro  DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(aluno_id) REFERENCES alunos(id),
-            UNIQUE(aluno_id, data_aula)
-        );
-    ''')
-
-    # Índices para performance nas consultas mais comuns
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_presencas_aluno ON presencas(aluno_id);")
-    cursor.execute("CREATE INDEX IF NOT EXISTS idx_tokens_token ON tokens_qrcode(token_gerado);")
-
-    _conexao.commit()
+    _conexao = psycopg.connect(DB_URL, row_factory=dict_row)
     return _conexao
 
 
-def get_conexao() -> sqlite3.Connection:
+def get_conexao() -> psycopg.Connection:
     """Retorna a conexão ativa. Garante que o banco foi inicializado."""
     if _conexao is None:
         return inicializar_banco()
@@ -82,12 +43,13 @@ def inserir_dados_teste():
     ]
     try:
         cursor.executemany(
-            "INSERT INTO alunos (nome, matricula, senha_hash) VALUES (?, ?, ?)",
+            "INSERT INTO alunos (nome, matricula, senha_hash) VALUES (%s, %s, %s)",
             alunos_teste
         )
         conn.commit()
         print("Alunos de teste inseridos com sucesso!")
-    except sqlite3.IntegrityError:
+    except psycopg.errors.UniqueViolation:
+        conn.rollback()
         print("Alunos de teste já cadastrados.")
 
 
