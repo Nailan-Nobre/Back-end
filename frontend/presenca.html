@@ -16,7 +16,14 @@
                     <div class="card-body p-4">
                         <h1 class="h3 mb-3">Registrar presença</h1>
                         <p class="text-muted mb-4">Preencha seus dados para confirmar a presença.</p>
-                        <form id="presenca-form" action="http://127.0.0.1:5000/presenca" method="post">
+
+                        <div id="token-alert" class="alert alert-warning d-none" role="alert">
+                            Token ausente. Escaneie o QR Code novamente.
+                        </div>
+                        <div id="msg-sucesso" class="alert alert-success d-none" role="alert"></div>
+                        <div id="msg-erro" class="alert alert-danger d-none" role="alert"></div>
+
+                        <form id="presenca-form">
                             <div class="mb-3">
                                 <label for="nome" class="form-label">Nome</label>
                                 <input type="text" id="nome" name="nome" class="form-control" required>
@@ -26,10 +33,9 @@
                                 <input type="text" id="matricula" name="matricula" class="form-control" required>
                             </div>
                             <input type="hidden" id="token" name="token">
-                            <div id="token-alert" class="alert alert-warning d-none" role="alert">
-                                Token ausente. Escaneie o QR Code novamente.
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                            <button type="submit" id="btn-submit" class="btn btn-primary w-100">
+                                Registrar
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -37,23 +43,68 @@
             </div>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ─── Troque pela URL real do seu backend no Render ───────────────────
+        const API_URL = "https://back-end-isvf.onrender.com";
+        // ─────────────────────────────────────────────────────────────────────
+
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
         const tokenInput = document.getElementById('token');
         const tokenAlert = document.getElementById('token-alert');
         const form = document.getElementById('presenca-form');
+        const btnSubmit = document.getElementById('btn-submit');
+        const msgSucesso = document.getElementById('msg-sucesso');
+        const msgErro = document.getElementById('msg-erro');
 
         if (token) {
             tokenInput.value = token;
         } else {
             tokenAlert.classList.remove('d-none');
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-            });
+            btnSubmit.disabled = true;
         }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();   // evita o envio HTML padrão (que ignoraria CORS)
+
+            msgSucesso.classList.add('d-none');
+            msgErro.classList.add('d-none');
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Registrando…';
+
+            const body = {
+                matricula: document.getElementById('matricula').value.trim(),
+                token: tokenInput.value,
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/presenca`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    msgSucesso.textContent = data.sucesso;
+                    msgSucesso.classList.remove('d-none');
+                    form.reset();
+                } else {
+                    msgErro.textContent = data.erro || 'Erro desconhecido.';
+                    msgErro.classList.remove('d-none');
+                    btnSubmit.disabled = false;
+                    btnSubmit.textContent = 'Registrar';
+                }
+            } catch (err) {
+                msgErro.textContent = 'Não foi possível conectar ao servidor. Tente novamente.';
+                msgErro.classList.remove('d-none');
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = 'Registrar';
+            }
+        });
     </script>
 </body>
 
