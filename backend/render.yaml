@@ -7,7 +7,7 @@ services:
     startCommand: gunicorn api:app --workers 2 --bind 0.0.0.0:$PORT
     envVars:
       - key: FRONTEND_URL
-        value: https://gestao-chamada.vercel.app   # ← troque pelo domínio real do Vercel
+        value: https://gestao-chamada.vercel.app
       - key: DB_PATH
         value: /opt/render/project/src/controle_presenca.db
       - key: QR_VALID_SECONDS

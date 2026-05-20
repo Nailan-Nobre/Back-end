@@ -1,600 +1,513 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=yes"
-    />
-    <title>Hackaton - Cadastro de Alunos</title>
-    <!-- Bootstrap 5 + Icons + Estilo consistente -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --sidebar-width: 240px;
-      }
 
-      body {
-        background: #f4f7fc;
-        font-family:
-          system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Hackaton - Cadastro de Alunos</title>
+  <!-- Bootstrap 5 + Icons + Estilo consistente -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --sidebar-width: 240px;
+    }
 
-      /* NAVBAR SUPERIOR - estilo semelhante aos arquivos existentes */
-      .navbar-brand {
-        font-weight: 700;
-        letter-spacing: -0.3px;
-      }
+    body {
+      background: #f4f7fc;
+      font-family:
+        system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
 
-      .bg-dark-custom {
-        background: #0f1115 !important;
-      }
+    /* NAVBAR SUPERIOR - estilo semelhante aos arquivos existentes */
+    .navbar-brand {
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
 
-      .card {
-        border: none;
-        border-radius: 1.25rem;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-      }
+    .bg-dark-custom {
+      background: #0f1115 !important;
+    }
 
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1) !important;
-      }
+    .card {
+      border: none;
+      border-radius: 1.25rem;
+      transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+    }
 
-      .btn-primary {
-        background: #2c3e66;
-        border: none;
-        border-radius: 2rem;
-        padding: 0.6rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.2s;
-      }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1) !important;
+    }
 
-      .btn-primary:hover {
-        background: #1e2a4a;
-        transform: scale(0.98);
-      }
+    .btn-primary {
+      background: #2c3e66;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
 
-      .btn-outline-success {
-        border-radius: 2rem;
-      }
+    .btn-primary:hover {
+      background: #1e2a4a;
+      transform: scale(0.98);
+    }
 
-      .table-alunos th {
-        background: #f1f5f9;
-        font-weight: 600;
-        border-bottom-width: 1px;
-      }
+    .btn-outline-success {
+      border-radius: 2rem;
+    }
 
-      .badge-matricula {
-        background: #eef2ff;
-        color: #1e3a8a;
-        font-weight: 500;
-        padding: 0.4rem 0.8rem;
-        border-radius: 40px;
-      }
+    .table-alunos th {
+      background: #f1f5f9;
+      font-weight: 600;
+      border-bottom-width: 1px;
+    }
 
-      .empty-state {
-        text-align: center;
-        padding: 2rem;
-        background: #ffffffcc;
-        border-radius: 1.5rem;
-      }
+    .badge-matricula {
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 40px;
+    }
 
-      .footer-note {
-        font-size: 0.85rem;
-        border-top: 1px solid #dee2e6;
-      }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      background: #ffffffcc;
+      border-radius: 1.5rem;
+    }
 
-      .qr-info {
-        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-        border-radius: 1rem;
-      }
+    .footer-note {
+      font-size: 0.85rem;
+      border-top: 1px solid #dee2e6;
+    }
 
-      @media (max-width: 768px) {
-        .container {
-          padding-left: 1rem;
-          padding-right: 1rem;
-        }
-      }
+    .qr-info {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      border-radius: 1rem;
+    }
 
-      /* animação leve */
-      .fade-transition {
-        transition: all 0.2s ease;
+    @media (max-width: 768px) {
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
       }
-    </style>
-  </head>
-  <body>
-    <!-- NAVBAR IDÊNTICA AO PADRÃO DOS ARQUIVOS (Hackaton) -->
-    <nav
-      class="navbar navbar-expand-lg navbar-dark bg-dark-custom shadow-sm sticky-top"
-    >
-      <div class="container position-relative">
-        <a
-          class="btn btn-outline-light btn-sm position-absolute start-0 ms-3"
-          href="index.html"
-        >
-          <i class="fa-solid fa-arrow-left me-1"></i> Voltar
+    }
+
+    /* animação leve */
+    .fade-transition {
+      transition: all 0.2s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR IDÊNTICA AO PADRÃO DOS ARQUIVOS (Hackaton) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark-custom shadow-sm sticky-top">
+    <div class="container position-relative">
+      <a class="btn btn-outline-light btn-sm position-absolute start-0 ms-3" href="index.html">
+        <i class="fa-solid fa-arrow-left me-1"></i> Voltar
+      </a>
+      <a class="navbar-brand fw-bold mx-auto" href="index.html">
+        <i class="fa-solid fa-laptop-code text-primary me-2"></i>Hackaton
+      </a>
+      <button class="navbar-toggler position-absolute end-0 me-3" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto gap-2">
+          <li class="nav-item">
+            <a class="nav-link" href="historico.html"><i class="fa-regular fa-clock me-1"></i>Listas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="qrCode.html"><i class="fa-solid fa-qrcode me-1"></i>QR Presença</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#"><i
+                class="fa-solid fa-user-graduate me-1"></i>Cadastrar</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <!-- Título da página -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="display-6 fw-bold text-dark">
+          <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Registrar
+          aluno
+        </h1>
+        <p class="text-muted">
+          Cadastre matrícula e nome do aluno. Depois ele poderá usar o
+          <strong>QR Code funcional</strong> para marcar presença.
+        </p>
+      </div>
+      <div class="mt-2 mt-sm-0">
+        <a href="qrCode.html" class="btn btn-outline-primary rounded-pill">
+          <i class="fa-solid fa-qrcode me-2"></i>Ir para QR Code →
         </a>
-        <a class="navbar-brand fw-bold mx-auto" href="index.html">
-          <i class="fa-solid fa-laptop-code text-primary me-2"></i>Hackaton
-        </a>
-        <button
-          class="navbar-toggler position-absolute end-0 me-3"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto gap-2">
-            <li class="nav-item">
-              <a class="nav-link" href="historico.html"
-                ><i class="fa-regular fa-clock me-1"></i>Listas</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="qrCode.html"
-                ><i class="fa-solid fa-qrcode me-1"></i>QR Presença</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#"
-                ><i class="fa-solid fa-user-graduate me-1"></i>Cadastrar</a
-              >
-            </li>
-          </ul>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- COLUDA ESQUERDA: FORMULÁRIO DE CADASTRO -->
+      <div class="col-12 col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+            <h3 class="h5 mb-0 fw-semibold">
+              <i class="fa-regular fa-id-card me-2 text-info"></i>Novo aluno
+            </h3>
+            <p class="text-muted small mt-1">
+              Preencha os dados corretamente
+            </p>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <form id="formCadastroAluno">
+              <div class="mb-3">
+                <label for="nomeAluno" class="form-label fw-medium">Nome completo</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa-regular fa-user"></i></span>
+                  <input type="text" class="form-control" id="nomeAluno" name="nome" placeholder="Ex: Ana Beatriz Souza"
+                    required autocomplete="off" />
+                </div>
+                <div class="form-text">
+                  Nome que aparecerá nas listas de presença.
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="matriculaAluno" class="form-label fw-medium">Matrícula</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa-solid fa-hashtag"></i></span>
+                  <input type="text" class="form-control" id="matriculaAluno" placeholder="Ex: 20240001, RA12345"
+                    required autocomplete="off" />
+                </div>
+                <div class="form-text">
+                  Identificador único (evite duplicar matrícula).
+                </div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                  <i class="fa-regular fa-floppy-disk me-2"></i>Cadastrar
+                  aluno
+                </button>
+                <button type="button" id="btnLimparForm" class="btn btn-outline-secondary py-1">
+                  <i class="fa-regular fa-eraser me-1"></i>Limpar campos
+                </button>
+              </div>
+            </form>
+
+            <!-- Informação extra sobre QR Code funcional -->
+            <div class="alert alert-info mt-4 mb-0 small d-flex align-items-center gap-2 p-3 rounded-4" role="alert">
+              <i class="fa-solid fa-circle-info fa-fw fs-5"></i>
+              <span>Após cadastrar o aluno, ele pode acessar a página
+                <strong>“QR Presença”</strong> (já funcional), escanear o
+                código com o celular e registrar presença utilizando seu nome
+                e matrícula. O sistema já grava os registros
+                automaticamente.</span>
+            </div>
+          </div>
         </div>
       </div>
-    </nav>
 
-    <main class="container py-5">
-      <!-- Título da página -->
-      <div
-        class="d-flex flex-wrap justify-content-between align-items-center mb-4"
-      >
-        <div>
-          <h1 class="display-6 fw-bold text-dark">
-            <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Registrar
-            aluno
-          </h1>
-          <p class="text-muted">
-            Cadastre matrícula e nome do aluno. Depois ele poderá usar o
-            <strong>QR Code funcional</strong> para marcar presença.
-          </p>
-        </div>
-        <div class="mt-2 mt-sm-0">
-          <a href="qrCode.html" class="btn btn-outline-primary rounded-pill">
-            <i class="fa-solid fa-qrcode me-2"></i>Ir para QR Code →
-          </a>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <!-- COLUDA ESQUERDA: FORMULÁRIO DE CADASTRO -->
-        <div class="col-12 col-lg-5">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
-              <h3 class="h5 mb-0 fw-semibold">
-                <i class="fa-regular fa-id-card me-2 text-info"></i>Novo aluno
+      <!-- COLUDA DIREITA: LISTA DE ALUNOS CADASTRADOS + AÇÕES -->
+      <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0">
+          <div
+            class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4">
+            <div>
+              <h3 class="h5 fw-semibold mb-0">
+                <i class="fa-solid fa-users me-2 text-primary"></i>Alunos
+                registrados
               </h3>
-              <p class="text-muted small mt-1">
-                Preencha os dados corretamente
-              </p>
+              <span class="small text-muted">Total: <span id="totalAlunosCount">0</span> alunos</span>
             </div>
-            <div class="card-body px-4 pb-4">
-              <form id="formCadastroAluno">
-                <div class="mb-3">
-                  <label for="nomeAluno" class="form-label fw-medium"
-                    >Nome completo</label
-                  >
-                  <div class="input-group">
-                    <span class="input-group-text bg-light"
-                      ><i class="fa-regular fa-user"></i
-                    ></span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="nomeAluno"
-                      name="nome"
-                      placeholder="Ex: Ana Beatriz Souza"
-                      required
-                      autocomplete="off"
-                    />
-                  </div>
-                  <div class="form-text">
-                    Nome que aparecerá nas listas de presença.
-                  </div>
-                </div>
+            <button id="btnRemoverTodos" class="btn btn-sm btn-outline-danger rounded-pill mt-2 mt-sm-0">
+              <i class="fa-regular fa-trash-can me-1"></i>Limpar tudo
+            </button>
+          </div>
+          <div class="card-body p-4 pt-2">
+            <!-- Área da lista com scroll responsivo -->
+            <div id="listaAlunosContainer" style="max-height: 460px; overflow-y: auto">
+              <!-- Tabela / cards vão ser preenchidos via JS -->
+              <div id="emptyListMessage" class="empty-state text-muted">
+                <i class="fa-regular fa-folder-open fa-3x mb-2 opacity-50"></i>
+                <p class="mb-0">
+                  Nenhum aluno cadastrado ainda.<br />Use o formulário ao lado
+                  para registrar matrícula e nome.
+                </p>
+              </div>
+              <table id="tabelaAlunos" class="table table-hover align-middle d-none">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th class="text-end">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="alunosTableBody"></tbody>
+              </table>
+            </div>
 
-                <div class="mb-4">
-                  <label for="matriculaAluno" class="form-label fw-medium"
-                    >Matrícula</label
-                  >
-                  <div class="input-group">
-                    <span class="input-group-text bg-light"
-                      ><i class="fa-solid fa-hashtag"></i
-                    ></span>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="matriculaAluno"
-                      placeholder="Ex: 20240001, RA12345"
-                      required
-                      autocomplete="off"
-                    />
-                  </div>
-                  <div class="form-text">
-                    Identificador único (evite duplicar matrícula).
-                  </div>
-                </div>
-
-                <div class="d-grid gap-2">
-                  <button
-                    type="submit"
-                    class="btn btn-primary py-2 fw-semibold"
-                  >
-                    <i class="fa-regular fa-floppy-disk me-2"></i>Cadastrar
-                    aluno
-                  </button>
-                  <button
-                    type="button"
-                    id="btnLimparForm"
-                    class="btn btn-outline-secondary py-1"
-                  >
-                    <i class="fa-regular fa-eraser me-1"></i>Limpar campos
-                  </button>
-                </div>
-              </form>
-
-              <!-- Informação extra sobre QR Code funcional -->
-              <div
-                class="alert alert-info mt-4 mb-0 small d-flex align-items-center gap-2 p-3 rounded-4"
-                role="alert"
-              >
-                <i class="fa-solid fa-circle-info fa-fw fs-5"></i>
-                <span
-                  >Após cadastrar o aluno, ele pode acessar a página
-                  <strong>“QR Presença”</strong> (já funcional), escanear o
-                  código com o celular e registrar presença utilizando seu nome
-                  e matrícula. O sistema já grava os registros
-                  automaticamente.</span
-                >
+            <!-- Aviso de integração com a página de presença e QR -->
+            <div class="mt-3 pt-2 border-top text-center qr-info p-3">
+              <i class="fa-solid fa-mobile-screen-button text-success me-2 fs-5"></i>
+              <span class="fw-medium">QR Code funcional:</span>
+              <span class="small">O sistema de presença já está ativo e integrado ao backend.
+                Alunos cadastrados aqui podem usar o QR na página
+                <code>qrCode.html</code> ou <code>presenca.html</code> para
+                confirmar presença.</span>
+              <div class="mt-2">
+                <a href="qrCode.html" class="btn btn-sm btn-dark rounded-pill px-3"><i
+                    class="fa-solid fa-arrow-up-right-from-square me-1"></i>Abrir página com QR Code</a>
+                <a href="presenca.html" class="btn btn-sm btn-outline-dark rounded-pill ms-2"><i
+                    class="fa-regular fa-address-card"></i> Página de
+                  presença</a>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- COLUDA DIREITA: LISTA DE ALUNOS CADASTRADOS + AÇÕES -->
-        <div class="col-12 col-lg-7">
-          <div class="card shadow-sm border-0">
-            <div
-              class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4"
-            >
+    <!-- Seção extra demonstrando compatibilidade com o fluxo existente -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card border-0 bg-white shadow-sm">
+          <div class="card-body py-3 px-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
               <div>
-                <h3 class="h5 fw-semibold mb-0">
-                  <i class="fa-solid fa-users me-2 text-primary"></i>Alunos
-                  registrados
-                </h3>
-                <span class="small text-muted"
-                  >Total: <span id="totalAlunosCount">0</span> alunos</span
-                >
+                <i class="fa-regular fa-circle-check text-success me-2"></i>
+                <strong class="me-1">Como funciona:</strong>
+                <span class="text-secondary small">Os alunos cadastrados ficam salvos no seu navegador
+                  (localStorage). Quando o aluno acessar o QR Code (já
+                  funcional) e preencher o formulário de presença, o sistema
+                  do backend registra a presença normalmente, integrando nome
+                  e matrícula.</span>
               </div>
-              <button
-                id="btnRemoverTodos"
-                class="btn btn-sm btn-outline-danger rounded-pill mt-2 mt-sm-0"
-              >
-                <i class="fa-regular fa-trash-can me-1"></i>Limpar tudo
-              </button>
-            </div>
-            <div class="card-body p-4 pt-2">
-              <!-- Área da lista com scroll responsivo -->
-              <div
-                id="listaAlunosContainer"
-                style="max-height: 460px; overflow-y: auto"
-              >
-                <!-- Tabela / cards vão ser preenchidos via JS -->
-                <div id="emptyListMessage" class="empty-state text-muted">
-                  <i
-                    class="fa-regular fa-folder-open fa-3x mb-2 opacity-50"
-                  ></i>
-                  <p class="mb-0">
-                    Nenhum aluno cadastrado ainda.<br />Use o formulário ao lado
-                    para registrar matrícula e nome.
-                  </p>
-                </div>
-                <table
-                  id="tabelaAlunos"
-                  class="table table-hover align-middle d-none"
-                >
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Matrícula</th>
-                      <th class="text-end">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="alunosTableBody"></tbody>
-                </table>
-              </div>
-
-              <!-- Aviso de integração com a página de presença e QR -->
-              <div class="mt-3 pt-2 border-top text-center qr-info p-3">
-                <i
-                  class="fa-solid fa-mobile-screen-button text-success me-2 fs-5"
-                ></i>
-                <span class="fw-medium">QR Code funcional:</span>
-                <span class="small"
-                  >O sistema de presença já está ativo e integrado ao backend.
-                  Alunos cadastrados aqui podem usar o QR na página
-                  <code>qrCode.html</code> ou <code>presenca.html</code> para
-                  confirmar presença.</span
-                >
-                <div class="mt-2">
-                  <a
-                    href="qrCode.html"
-                    class="btn btn-sm btn-dark rounded-pill px-3"
-                    ><i class="fa-solid fa-arrow-up-right-from-square me-1"></i
-                    >Abrir página com QR Code</a
-                  >
-                  <a
-                    href="presenca.html"
-                    class="btn btn-sm btn-outline-dark rounded-pill ms-2"
-                    ><i class="fa-regular fa-address-card"></i> Página de
-                    presença</a
-                  >
-                </div>
-              </div>
+              <i class="fa-solid fa-qrcode fa-2x text-secondary opacity-50"></i>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </main>
 
-      <!-- Seção extra demonstrando compatibilidade com o fluxo existente -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card border-0 bg-white shadow-sm">
-            <div class="card-body py-3 px-4">
-              <div
-                class="d-flex flex-wrap align-items-center justify-content-between gap-2"
-              >
-                <div>
-                  <i class="fa-regular fa-circle-check text-success me-2"></i>
-                  <strong class="me-1">Como funciona:</strong>
-                  <span class="text-secondary small"
-                    >Os alunos cadastrados ficam salvos no seu navegador
-                    (localStorage). Quando o aluno acessar o QR Code (já
-                    funcional) e preencher o formulário de presença, o sistema
-                    do backend registra a presença normalmente, integrando nome
-                    e matrícula.</span
-                  >
-                </div>
-                <i
-                  class="fa-solid fa-qrcode fa-2x text-secondary opacity-50"
-                ></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+  <footer class="text-center text-muted small py-4 footer-note mt-4 bg-white">
+    <i class="fa-regular fa-copyright"></i> Hackaton - Sistema de Chamada com
+    QR Code | Cadastro de alunos local para gestão
+  </footer>
 
-    <footer class="text-center text-muted small py-4 footer-note mt-4 bg-white">
-      <i class="fa-regular fa-copyright"></i> Hackaton - Sistema de Chamada com
-      QR Code | Cadastro de alunos local para gestão
-    </footer>
+  <script>
+    // ======================= GERENCIAMENTO DE ALUNOS (LOCALSTORAGE) =======================
+    // Chave única para armazenar os alunos cadastrados
+    const STORAGE_KEY = "hackaton_alunos";
 
-    <script>
-      // ======================= GERENCIAMENTO DE ALUNOS (LOCALSTORAGE) =======================
-      // Chave única para armazenar os alunos cadastrados
-      const STORAGE_KEY = "hackaton_alunos";
-
-      // Carregar alunos do localStorage
-      function carregarAlunos() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          try {
-            return JSON.parse(stored);
-          } catch (e) {
-            return [];
-          }
+    // Carregar alunos do localStorage
+    function carregarAlunos() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          return [];
         }
-        return [];
+      }
+      return [];
+    }
+
+    // Salvar array de alunos no localStorage
+    function salvarAlunos(alunos) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
+      renderizarListaAlunos(); // atualiza UI
+    }
+
+    // Adicionar novo aluno (validação de duplicata por matrícula)
+    function adicionarAluno(nome, matricula) {
+      if (!nome || !matricula) {
+        mostrarToast("Preencha nome e matrícula corretamente.", "warning");
+        return false;
       }
 
-      // Salvar array de alunos no localStorage
-      function salvarAlunos(alunos) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
-        renderizarListaAlunos(); // atualiza UI
-      }
-
-      // Adicionar novo aluno (validação de duplicata por matrícula)
-      function adicionarAluno(nome, matricula) {
-        if (!nome || !matricula) {
-          mostrarToast("Preencha nome e matrícula corretamente.", "warning");
-          return false;
-        }
-
-        const alunos = carregarAlunos();
-        // Verificar se matrícula já existe (case sensitive, mas tratamos como string)
-        const matriculaExistente = alunos.some(
-          (aluno) =>
-            aluno.matricula.toLowerCase() === matricula.toLowerCase().trim(),
-        );
-        if (matriculaExistente) {
-          mostrarToast(
-            `A matrícula "${matricula}" já está cadastrada. Utilize uma única matrícula por aluno.`,
-            "danger",
-          );
-          return false;
-        }
-
-        const novoAluno = {
-          id: Date.now() + Math.floor(Math.random() * 10000),
-          nome: nome.trim(),
-          matricula: matricula.trim(),
-          dataCadastro: new Date().toISOString(),
-        };
-        alunos.push(novoAluno);
-        salvarAlunos(alunos);
+      const alunos = carregarAlunos();
+      // Verificar se matrícula já existe (case sensitive, mas tratamos como string)
+      const matriculaExistente = alunos.some(
+        (aluno) =>
+          aluno.matricula.toLowerCase() === matricula.toLowerCase().trim(),
+      );
+      if (matriculaExistente) {
         mostrarToast(
-          `Aluno ${novoAluno.nome} cadastrado com sucesso!`,
-          "success",
+          `A matrícula "${matricula}" já está cadastrada. Utilize uma única matrícula por aluno.`,
+          "danger",
         );
-        return true;
+        return false;
       }
 
-      // Remover aluno por ID
-      function removerAluno(id) {
-        let alunos = carregarAlunos();
-        const alunoRemovido = alunos.find((a) => a.id === id);
-        if (!alunoRemovido) return;
-        alunos = alunos.filter((aluno) => aluno.id !== id);
-        salvarAlunos(alunos);
-        mostrarToast(`Aluno ${alunoRemovido.nome} removido.`, "secondary");
+      const novoAluno = {
+        id: Date.now() + Math.floor(Math.random() * 10000),
+        nome: nome.trim(),
+        matricula: matricula.trim(),
+        dataCadastro: new Date().toISOString(),
+      };
+      alunos.push(novoAluno);
+      salvarAlunos(alunos);
+      mostrarToast(
+        `Aluno ${novoAluno.nome} cadastrado com sucesso!`,
+        "success",
+      );
+      return true;
+    }
+
+    // Remover aluno por ID
+    function removerAluno(id) {
+      let alunos = carregarAlunos();
+      const alunoRemovido = alunos.find((a) => a.id === id);
+      if (!alunoRemovido) return;
+      alunos = alunos.filter((aluno) => aluno.id !== id);
+      salvarAlunos(alunos);
+      mostrarToast(`Aluno ${alunoRemovido.nome} removido.`, "secondary");
+    }
+
+    // Remover todos os alunos
+    function removerTodosAlunos() {
+      if (carregarAlunos().length === 0) {
+        mostrarToast("Nenhum aluno cadastrado para remover.", "info");
+        return;
+      }
+      if (
+        confirm(
+          "⚠️ Atenção: isso vai excluir TODOS os alunos cadastrados localmente. Deseja continuar?",
+        )
+      ) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderizarListaAlunos();
+        mostrarToast(
+          "Todos os alunos foram removidos da lista local.",
+          "info",
+        );
+      }
+    }
+
+    // ======================= RENDERIZAÇÃO DA LISTA DINÂMICA =======================
+    function renderizarListaAlunos() {
+      const alunos = carregarAlunos();
+      const tabela = document.getElementById("tabelaAlunos");
+      const tbody = document.getElementById("alunosTableBody");
+      const emptyDiv = document.getElementById("emptyListMessage");
+      const totalSpan = document.getElementById("totalAlunosCount");
+
+      // Atualizar contador
+      if (totalSpan) totalSpan.innerText = alunos.length;
+
+      if (!alunos.length) {
+        // Mostra mensagem vazia e esconde tabela
+        if (emptyDiv) emptyDiv.classList.remove("d-none");
+        if (tabela) tabela.classList.add("d-none");
+        return;
       }
 
-      // Remover todos os alunos
-      function removerTodosAlunos() {
-        if (carregarAlunos().length === 0) {
-          mostrarToast("Nenhum aluno cadastrado para remover.", "info");
-          return;
-        }
-        if (
-          confirm(
-            "⚠️ Atenção: isso vai excluir TODOS os alunos cadastrados localmente. Deseja continuar?",
-          )
-        ) {
-          localStorage.removeItem(STORAGE_KEY);
-          renderizarListaAlunos();
-          mostrarToast(
-            "Todos os alunos foram removidos da lista local.",
-            "info",
-          );
-        }
-      }
+      // Esconde empty e mostra tabela
+      if (emptyDiv) emptyDiv.classList.add("d-none");
+      if (tabela) tabela.classList.remove("d-none");
 
-      // ======================= RENDERIZAÇÃO DA LISTA DINÂMICA =======================
-      function renderizarListaAlunos() {
-        const alunos = carregarAlunos();
-        const tabela = document.getElementById("tabelaAlunos");
-        const tbody = document.getElementById("alunosTableBody");
-        const emptyDiv = document.getElementById("emptyListMessage");
-        const totalSpan = document.getElementById("totalAlunosCount");
-
-        // Atualizar contador
-        if (totalSpan) totalSpan.innerText = alunos.length;
-
-        if (!alunos.length) {
-          // Mostra mensagem vazia e esconde tabela
-          if (emptyDiv) emptyDiv.classList.remove("d-none");
-          if (tabela) tabela.classList.add("d-none");
-          return;
-        }
-
-        // Esconde empty e mostra tabela
-        if (emptyDiv) emptyDiv.classList.add("d-none");
-        if (tabela) tabela.classList.remove("d-none");
-
-        // Preenche corpo da tabela
-        tbody.innerHTML = "";
-        alunos.forEach((aluno) => {
-          const tr = document.createElement("tr");
-          // Coluna Nome
-          const tdNome = document.createElement("td");
-          tdNome.innerHTML = `<strong>${escapeHtml(aluno.nome)}</strong>`;
-          // Coluna Matrícula com badge
-          const tdMatricula = document.createElement("td");
-          tdMatricula.innerHTML = `<span class="badge-matricula">${escapeHtml(aluno.matricula)}</span>`;
-          // Coluna Ações (botões)
-          const tdAcoes = document.createElement("td");
-          tdAcoes.className = "text-end";
-          const btnRemover = document.createElement("button");
-          btnRemover.className =
-            "btn btn-sm btn-outline-danger rounded-pill px-3";
-          btnRemover.innerHTML =
-            '<i class="fa-regular fa-trash-can me-1"></i>Remover';
-          btnRemover.addEventListener("click", (e) => {
-            e.stopPropagation();
-            removerAluno(aluno.id);
-          });
-          // Botão rápido para copiar dados para área de transferência (ajuda no preenchimento do QR)
-          const btnCopiar = document.createElement("button");
-          btnCopiar.className = "btn btn-sm btn-outline-info rounded-pill me-2";
-          btnCopiar.innerHTML = '<i class="fa-regular fa-copy"></i>';
-          btnCopiar.title = "Copiar nome e matrícula";
-          btnCopiar.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const dados = `${aluno.nome} | ${aluno.matricula}`;
-            navigator.clipboard
-              .writeText(dados)
-              .then(() => {
-                mostrarToast(
-                  "Dados copiados! Use no formulário de presença.",
-                  "success",
-                );
-              })
-              .catch(() => mostrarToast("Não foi possível copiar", "warning"));
-          });
-          tdAcoes.appendChild(btnCopiar);
-          tdAcoes.appendChild(btnRemover);
-          tr.appendChild(tdNome);
-          tr.appendChild(tdMatricula);
-          tr.appendChild(tdAcoes);
-          tbody.appendChild(tr);
+      // Preenche corpo da tabela
+      tbody.innerHTML = "";
+      alunos.forEach((aluno) => {
+        const tr = document.createElement("tr");
+        // Coluna Nome
+        const tdNome = document.createElement("td");
+        tdNome.innerHTML = `<strong>${escapeHtml(aluno.nome)}</strong>`;
+        // Coluna Matrícula com badge
+        const tdMatricula = document.createElement("td");
+        tdMatricula.innerHTML = `<span class="badge-matricula">${escapeHtml(aluno.matricula)}</span>`;
+        // Coluna Ações (botões)
+        const tdAcoes = document.createElement("td");
+        tdAcoes.className = "text-end";
+        const btnRemover = document.createElement("button");
+        btnRemover.className =
+          "btn btn-sm btn-outline-danger rounded-pill px-3";
+        btnRemover.innerHTML =
+          '<i class="fa-regular fa-trash-can me-1"></i>Remover';
+        btnRemover.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removerAluno(aluno.id);
         });
-      }
+        // Botão rápido para copiar dados para área de transferência (ajuda no preenchimento do QR)
+        const btnCopiar = document.createElement("button");
+        btnCopiar.className = "btn btn-sm btn-outline-info rounded-pill me-2";
+        btnCopiar.innerHTML = '<i class="fa-regular fa-copy"></i>';
+        btnCopiar.title = "Copiar nome e matrícula";
+        btnCopiar.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const dados = `${aluno.nome} | ${aluno.matricula}`;
+          navigator.clipboard
+            .writeText(dados)
+            .then(() => {
+              mostrarToast(
+                "Dados copiados! Use no formulário de presença.",
+                "success",
+              );
+            })
+            .catch(() => mostrarToast("Não foi possível copiar", "warning"));
+        });
+        tdAcoes.appendChild(btnCopiar);
+        tdAcoes.appendChild(btnRemover);
+        tr.appendChild(tdNome);
+        tr.appendChild(tdMatricula);
+        tr.appendChild(tdAcoes);
+        tbody.appendChild(tr);
+      });
+    }
 
-      // simples escape para evitar XSS
-      function escapeHtml(str) {
-        if (!str) return "";
-        return str
-          .replace(/[&<>]/g, function (m) {
-            if (m === "&") return "&amp;";
-            if (m === "<") return "&lt;";
-            if (m === ">") return "&gt;";
-            return m;
-          })
-          .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (c) {
-            return c;
-          });
-      }
+    // simples escape para evitar XSS
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        })
+        .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (c) {
+          return c;
+        });
+    }
 
-      // ======================= TOAST SIMPLES (estilo bootstrap opcional) =======================
-      function mostrarToast(mensagem, tipo = "success") {
-        // Criar elemento toast dinâmico (já que não temos estrutura fixa)
-        const toastContainer = document.getElementById(
-          "dynamic-toast-container",
-        );
-        if (!toastContainer) {
-          const container = document.createElement("div");
-          container.id = "dynamic-toast-container";
-          container.style.position = "fixed";
-          container.style.bottom = "20px";
-          container.style.right = "20px";
-          container.style.zIndex = "9999";
-          document.body.appendChild(container);
-        }
-        const containerFinal = document.getElementById(
-          "dynamic-toast-container",
-        );
-        const toastEl = document.createElement("div");
-        toastEl.className = `toast align-items-center text-white bg-${tipo === "success" ? "success" : tipo === "danger" ? "danger" : tipo === "warning" ? "warning" : "secondary"} border-0 mb-2`;
-        toastEl.setAttribute("role", "alert");
-        toastEl.setAttribute("aria-live", "assertive");
-        toastEl.setAttribute("aria-atomic", "true");
-        toastEl.style.minWidth = "250px";
-        toastEl.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
-        toastEl.innerHTML = `
+    // ======================= TOAST SIMPLES (estilo bootstrap opcional) =======================
+    function mostrarToast(mensagem, tipo = "success") {
+      // Criar elemento toast dinâmico (já que não temos estrutura fixa)
+      const toastContainer = document.getElementById(
+        "dynamic-toast-container",
+      );
+      if (!toastContainer) {
+        const container = document.createElement("div");
+        container.id = "dynamic-toast-container";
+        container.style.position = "fixed";
+        container.style.bottom = "20px";
+        container.style.right = "20px";
+        container.style.zIndex = "9999";
+        document.body.appendChild(container);
+      }
+      const containerFinal = document.getElementById(
+        "dynamic-toast-container",
+      );
+      const toastEl = document.createElement("div");
+      toastEl.className = `toast align-items-center text-white bg-${tipo === "success" ? "success" : tipo === "danger" ? "danger" : tipo === "warning" ? "warning" : "secondary"} border-0 mb-2`;
+      toastEl.setAttribute("role", "alert");
+      toastEl.setAttribute("aria-live", "assertive");
+      toastEl.setAttribute("aria-atomic", "true");
+      toastEl.style.minWidth = "250px";
+      toastEl.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
+      toastEl.innerHTML = `
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="fa-regular fa-bell me-2"></i> ${mensagem}
@@ -602,89 +515,90 @@
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             `;
-        containerFinal.appendChild(toastEl);
-        const bsToast = new bootstrap.Toast(toastEl, {
-          delay: 3000,
-          autohide: true,
-        });
-        bsToast.show();
-        toastEl.addEventListener("hidden.bs.toast", () => {
-          toastEl.remove();
-        });
-      }
-
-      // ======================= LIMPAR FORMULÁRIO =======================
-      function limparFormulario() {
-        document.getElementById("nomeAluno").value = "";
-        document.getElementById("matriculaAluno").value = "";
-        document.getElementById("nomeAluno").focus();
-      }
-
-      // ======================= EVENTOS E INICIALIZAÇÃO =======================
-      document.addEventListener("DOMContentLoaded", () => {
-        // Renderizar lista existente
-        renderizarListaAlunos();
-
-        // Form submit
-        const form = document.getElementById("formCadastroAluno");
-        if (form) {
-          form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const nomeInput = document.getElementById("nomeAluno");
-            const matriculaInput = document.getElementById("matriculaAluno");
-            const nome = nomeInput.value.trim();
-            const matricula = matriculaInput.value.trim();
-
-            if (adicionarAluno(nome, matricula)) {
-              // Se cadastro bem sucedido, limpa formulário
-              nomeInput.value = "";
-              matriculaInput.value = "";
-              nomeInput.focus();
-            }
-          });
-        }
-
-        // Botão limpar campos
-        const btnLimpar = document.getElementById("btnLimparForm");
-        if (btnLimpar) {
-          btnLimpar.addEventListener("click", () => {
-            limparFormulario();
-          });
-        }
-
-        // Botão remover todos
-        const btnRemoverTodos = document.getElementById("btnRemoverTodos");
-        if (btnRemoverTodos) {
-          btnRemoverTodos.addEventListener("click", () => {
-            removerTodosAlunos();
-          });
-        }
-
-        // Além disso, fornecer uma verificação de integridade com backend via console (sem interferência)
-        // Pequena validação de rotas para o professor saber que o QR já está funcional:
-        const apiUrl = "https://back-end-isvf.onrender.com";
-        fetch(`${apiUrl}/qr-config`, { method: "GET", cache: "no-cache" })
-          .then((res) =>
-            res.ok
-              ? console.log("✅ Backend online, QR funcional ativo.")
-              : null,
-          )
-          .catch(() =>
-            console.warn(
-              "⚠️ Não foi possível conectar ao backend, mas o QR Code funcionará normalmente quando estiver online.",
-            ),
-          );
-
-        // Dica: para facilitar a vida, pré-popular com dados de exemplo se estiver vazio? (opcional, sem poluir)
-        const alunosExistentes = carregarAlunos();
-        if (alunosExistentes.length === 0) {
-          // não adicionamos automaticamente para não poluir; apenas caso queira exemplo, mas deixamos vazio.
-          // O usuário fará cadastros manuais. Nenhum dado padrão invasivo.
-        }
+      containerFinal.appendChild(toastEl);
+      const bsToast = new bootstrap.Toast(toastEl, {
+        delay: 3000,
+        autohide: true,
       });
-    </script>
+      bsToast.show();
+      toastEl.addEventListener("hidden.bs.toast", () => {
+        toastEl.remove();
+      });
+    }
 
-    <!-- Bootstrap JS necessário para toasts e interações -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    // ======================= LIMPAR FORMULÁRIO =======================
+    function limparFormulario() {
+      document.getElementById("nomeAluno").value = "";
+      document.getElementById("matriculaAluno").value = "";
+      document.getElementById("nomeAluno").focus();
+    }
+
+    // ======================= EVENTOS E INICIALIZAÇÃO =======================
+    document.addEventListener("DOMContentLoaded", () => {
+      // Renderizar lista existente
+      renderizarListaAlunos();
+
+      // Form submit
+      const form = document.getElementById("formCadastroAluno");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const nomeInput = document.getElementById("nomeAluno");
+          const matriculaInput = document.getElementById("matriculaAluno");
+          const nome = nomeInput.value.trim();
+          const matricula = matriculaInput.value.trim();
+
+          if (adicionarAluno(nome, matricula)) {
+            // Se cadastro bem sucedido, limpa formulário
+            nomeInput.value = "";
+            matriculaInput.value = "";
+            nomeInput.focus();
+          }
+        });
+      }
+
+      // Botão limpar campos
+      const btnLimpar = document.getElementById("btnLimparForm");
+      if (btnLimpar) {
+        btnLimpar.addEventListener("click", () => {
+          limparFormulario();
+        });
+      }
+
+      // Botão remover todos
+      const btnRemoverTodos = document.getElementById("btnRemoverTodos");
+      if (btnRemoverTodos) {
+        btnRemoverTodos.addEventListener("click", () => {
+          removerTodosAlunos();
+        });
+      }
+
+      // Além disso, fornecer uma verificação de integridade com backend via console (sem interferência)
+      // Pequena validação de rotas para o professor saber que o QR já está funcional:
+      const apiUrl = "https://back-end-isvf.onrender.com";
+      fetch(`${apiUrl}/qr-config`, { method: "GET", cache: "no-cache" })
+        .then((res) =>
+          res.ok
+            ? console.log("✅ Backend online, QR funcional ativo.")
+            : null,
+        )
+        .catch(() =>
+          console.warn(
+            "⚠️ Não foi possível conectar ao backend, mas o QR Code funcionará normalmente quando estiver online.",
+          ),
+        );
+
+      // Dica: para facilitar a vida, pré-popular com dados de exemplo se estiver vazio? (opcional, sem poluir)
+      const alunosExistentes = carregarAlunos();
+      if (alunosExistentes.length === 0) {
+        // não adicionamos automaticamente para não poluir; apenas caso queira exemplo, mas deixamos vazio.
+        // O usuário fará cadastros manuais. Nenhum dado padrão invasivo.
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS necessário para toasts e interações -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
 </html>
