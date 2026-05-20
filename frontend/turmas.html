@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hackaton - Minhas Turmas</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+
+    .bg-dark-custom {
+      background: #0f1115 !important;
+    }
+
+    .btn-primary {
+      background: #2c3e66;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #1e2a4a;
+      transform: scale(0.98);
+    }
+
+    /* Estilo dos cards idêntico ao padrão do projeto */
+    .card-turma {
+      border: none;
+      border-radius: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-turma:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Oculta o botão por padrão e mostra no hover da turma */
+    .btn-visualizar-overlay {
+      position: absolute;
+      bottom: -60px; /* Escondido para baixo */
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 1rem;
+      background: linear-gradient(to top, rgba(255,255,255,1) 40%, rgba(255,255,255,0));
+      transition: all 0.3s ease-in-out;
+      opacity: 0;
+    }
+
+    .card-turma:hover .btn-visualizar-overlay {
+      bottom: 0;
+      opacity: 1;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: #ffffffcc;
+      border-radius: 1.5rem;
+      border: 2px dashed #dee2e6;
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark-custom shadow-sm sticky-top">
+    <div class="container position-relative">
+      <a class="navbar-brand fw-bold mx-auto" href="#">
+        <i class="fa-solid fa-laptop-code text-primary me-2"></i>Hackaton
+      </a>
+      <div class="position-absolute end-0 me-3 text-white d-none d-md-block">
+        <i class="fa-regular fa-circle-user fs-4 align-middle me-2"></i>
+        <span class="align-middle">Prof. Douglas</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5 flex-grow-1">
+    
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-5 border-bottom pb-3">
+      <div>
+        <h1 class="fw-bold display-6 text-dark mb-1">Minhas Turmas</h1>
+        <p class="text-muted mb-0">Gerencie suas disciplinas e listas de presença.</p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNovaTurma">
+          <i class="fa-solid fa-plus me-2"></i>Adicionar Turma
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-4" id="container-turmas">
+      </div>
+
+    <div id="estado-vazio" class="empty-state d-none mt-4">
+      <i class="fa-solid fa-chalkboard-user fa-3x mb-3 text-secondary opacity-50"></i>
+      <h3 class="h5 text-dark fw-semibold">Nenhuma turma cadastrada</h3>
+      <p class="text-muted mb-4">Você ainda não possui turmas. Crie sua primeira turma para começar a registrar presenças.</p>
+      <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalNovaTurma">
+        Criar Primeira Turma
+      </button>
+    </div>
+
+  </main>
+
+  <div class="modal fade" id="modalNovaTurma" tabindex="-1" aria-labelledby="modalNovaTurmaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow" style="border-radius: 1.25rem;">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold" id="modalNovaTurmaLabel">
+            <i class="fa-solid fa-folder-plus text-primary me-2"></i>Nova Turma
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="formCriarTurma">
+          <div class="modal-body pt-4">
+            <div class="mb-3">
+              <label for="nomeDisciplina" class="form-label fw-medium">Nome da Disciplina</label>
+              <input type="text" class="form-control bg-light" id="nomeDisciplina" placeholder="Ex: Lógica de Programação" required>
+            </div>
+            <div class="mb-3">
+              <label for="codigoTurma" class="form-label fw-medium">Código / Semestre</label>
+              <input type="text" class="form-control bg-light" id="codigoTurma" placeholder="Ex: 2026.1 - ADS" required>
+            </div>
+            <div class="mb-3">
+              <label for="corTurma" class="form-label fw-medium">Cor de identificação</label>
+              <input type="color" class="form-control form-control-color bg-light w-100" id="corTurma" value="#2c3e66" title="Escolha a cor da turma">
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Criar Turma</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Gerenciamento de estado das turmas no LocalStorage
+    const STORAGE_TURMAS_KEY = "hackaton_turmas";
+
+    function carregarTurmas() {
+      const stored = localStorage.getItem(STORAGE_TURMAS_KEY);
+      return stored ? JSON.parse(stored) : [];
+    }
+
+    function salvarTurmas(turmas) {
+      localStorage.setItem(STORAGE_TURMAS_KEY, JSON.stringify(turmas));
+    }
+
+    function renderizarTurmas() {
+      const turmas = carregarTurmas();
+      const container = document.getElementById("container-turmas");
+      const estadoVazio = document.getElementById("estado-vazio");
+
+      container.innerHTML = "";
+
+      if (turmas.length === 0) {
+        estadoVazio.classList.remove("d-none");
+      } else {
+        estadoVazio.classList.add("d-none");
+        
+        turmas.forEach(turma => {
+          const col = document.createElement("div");
+          col.className = "col-12 col-md-6 col-lg-4";
+          
+          col.innerHTML = `
+            <div class="card card-turma h-100 shadow-sm bg-white">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 48px; height: 48px; background-color: ${turma.cor}; color: white;">
+                    <i class="fa-solid fa-book fs-5"></i>
+                  </div>
+                  <div>
+                    <h5 class="card-title fw-bold mb-0 text-truncate" style="max-width: 200px;" title="${turma.disciplina}">${turma.disciplina}</h5>
+                    <span class="badge bg-light text-dark border mt-1">${turma.codigo}</span>
+                  </div>
+                </div>
+                <p class="text-muted small mb-4">Gerencie as frequências, QR Codes e alunos matriculados nesta disciplina.</p>
+                
+                <div class="btn-visualizar-overlay">
+                  <a href="index.html" class="btn btn-dark rounded-pill w-100 shadow">
+                    <i class="fa-solid fa-eye me-2"></i>Visualizar Turma
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+          container.appendChild(col);
+        });
+      }
+    }
+
+    // Controle do Formulário do Modal
+    document.addEventListener("DOMContentLoaded", () => {
+      renderizarTurmas();
+
+      const form = document.getElementById("formCriarTurma");
+      
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const disciplina = document.getElementById("nomeDisciplina").value.trim();
+        const codigo = document.getElementById("codigoTurma").value.trim();
+        const cor = document.getElementById("corTurma").value;
+
+        const turmas = carregarTurmas();
+        turmas.push({
+          id: Date.now(),
+          disciplina: disciplina,
+          codigo: codigo,
+          cor: cor
+        });
+
+        salvarTurmas(turmas);
+        renderizarTurmas();
+
+        // Fechar o modal e limpar o formulário
+        const modalElement = document.getElementById('modalNovaTurma');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        modalInstance.hide();
+        form.reset();
+      });
+    });
+  </script>
+</body>
+</html>
