@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title id="pageTitle">Hackaton - Turma</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: #f8f9fa;
+      font-family: system-ui, "Segoe UI", sans-serif;
+    }
+
+    .navbar-custom {
+      background: #0f1115;
+    }
+
+    .header-turma {
+      border-radius: 1.8rem;
+      padding: 2.5rem;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-turma::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right,
+          rgba(255, 255, 255, 0.18),
+          transparent 30%);
+      pointer-events: none;
+    }
+
+    .card-disciplina {
+      border: none;
+      border-radius: 1.2rem;
+      transition: 0.25s ease;
+      cursor: pointer;
+      background: white;
+    }
+
+    .card-disciplina:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.4rem;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+    }
+
+    .empty-state {
+      background: white;
+      border-radius: 1.5rem;
+      border: 2px dashed #d8d8d8;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .disciplina-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .subtitle {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-dark navbar-custom shadow-sm">
+    <div class="container">
+      <a href="index.html" class="navbar-brand fw-bold">
+        <i class="fa-solid fa-arrow-left me-2"></i>
+        Voltar
+      </a>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+
+    <!-- HEADER -->
+    <div
+      class="header-turma shadow mb-5"
+      id="headerTurma"
+      style="background: #2c3e66;">
+
+      <div class="position-relative">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-4">
+
+          <div>
+
+            <span
+              class="badge rounded-pill bg-light text-dark mb-3 px-3 py-2">
+
+              <i class="fa-solid fa-graduation-cap me-2"></i>
+              Painel da Turma
+            </span>
+
+            <h1 class="display-6 fw-bold mb-2" id="nomeTurma">
+              Turma
+            </h1>
+
+            <p class="subtitle mb-0" id="descricaoTurma">
+              Gerencie as disciplinas dessa turma
+            </p>
+
+          </div>
+
+          <button
+            class="btn btn-light shadow-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#modalNovaDisciplina">
+
+            <i class="fa-solid fa-plus me-2"></i>
+            Nova Disciplina
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- LISTA -->
+    <div class="row g-4" id="container-disciplinas"></div>
+
+    <!-- ESTADO VAZIO -->
+    <div id="estado-vazio" class="empty-state d-none">
+
+      <i class="fa-solid fa-book-open fa-3x mb-4 text-secondary opacity-50"></i>
+
+      <h3 class="fw-bold">
+        Nenhuma disciplina cadastrada
+      </h3>
+
+      <p class="text-muted mb-4">
+        Crie a primeira disciplina dessa turma.
+      </p>
+
+      <button
+        class="btn btn-primary"
+        id="btnCriarPrimeira">
+
+        <i class="fa-solid fa-plus me-2"></i>
+        Criar Disciplina
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal fade" id="modalNovaDisciplina" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+      <div class="modal-content border-0 shadow"
+        style="border-radius: 1.5rem;">
+
+        <div class="modal-header border-0 pb-0">
+
+          <h5 class="modal-title fw-bold">
+            <i class="fa-solid fa-book-medical me-2 text-primary"></i>
+            Nova Disciplina
+          </h5>
+
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal">
+          </button>
+
+        </div>
+
+        <form id="formDisciplina">
+
+          <div class="modal-body">
+
+            <div class="mb-3">
+
+              <label class="form-label fw-semibold">
+                Nome da disciplina
+              </label>
+
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="nomeDisciplina"
+                placeholder="Ex: Matemática"
+                required />
+
+            </div>
+
+          </div>
+
+          <div class="modal-footer border-0">
+
+            <button
+              type="button"
+              class="btn btn-light"
+              data-bs-dismiss="modal">
+
+              Cancelar
+            </button>
+
+            <button type="submit" class="btn btn-primary" id="btnSalvar">
+              Criar Disciplina
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const API_URL = "http://127.0.0.1:5000";
+
+    const params = new URLSearchParams(window.location.search);
+
+    const turmaId = params.get("id");
+    const turmaNome = params.get("nome") || "Turma";
+    const turmaCor = params.get("cor") || "#2c3e66";
+
+    const nomeTurma = document.getElementById("nomeTurma");
+    const descricaoTurma = document.getElementById("descricaoTurma");
+    const container = document.getElementById("container-disciplinas");
+    const estadoVazio = document.getElementById("estado-vazio");
+    const headerTurma = document.getElementById("headerTurma");
+    const pageTitle = document.getElementById("pageTitle");
+
+    // ALTERA TITULO DINAMICAMENTE
+    document.title = `${turmaNome} - Disciplinas`;
+
+    // DEFINE DADOS DA TURMA
+    nomeTurma.textContent = turmaNome;
+
+    descricaoTurma.textContent =
+      `Gerencie as disciplinas da ${turmaNome}`;
+
+    headerTurma.style.background = turmaCor;
+
+    document.documentElement.style.setProperty(
+      "--cor-turma",
+      turmaCor
+    );
+
+    // ALTERA COR DO BOTÃO PRINCIPAL
+    document.querySelectorAll(".btn-primary")
+      .forEach(btn => {
+        btn.style.background = turmaCor;
+      });
+
+    async function carregarDisciplinas() {
+
+      try {
+
+        const resposta = await fetch(
+          `${API_URL}/disciplinas/${turmaId}`
+        );
+
+        const disciplinas = await resposta.json();
+
+        container.innerHTML = "";
+
+        if (!disciplinas.length) {
+          estadoVazio.classList.remove("d-none");
+          return;
+        }
+
+        estadoVazio.classList.add("d-none");
+
+        disciplinas.forEach((disciplina) => {
+
+          container.innerHTML += `
+          
+            <div class="col-12 col-md-6 col-lg-4">
+
+              <div class="card card-disciplina shadow-sm h-100">
+
+                <div class="card-body">
+
+                  <div class="d-flex justify-content-between align-items-start">
+
+                    <div>
+
+                      <div
+                        class="disciplina-icon mb-3"
+                        style="
+                          background: ${turmaCor}15;
+                          color: ${turmaCor};
+                        ">
+
+                        <i class="fa-solid fa-book"></i>
+
+                      </div>
+
+                      <h5 class="fw-bold mb-2">
+                        ${disciplina.nome}
+                      </h5>
+
+                      <p class="text-muted mb-0">
+                        Disciplina cadastrada
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+          
+          `;
+        });
+
+      } catch (erro) {
+        console.error(erro);
+      }
+    }
+
+    document
+      .getElementById("formDisciplina")
+      .addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const nome = document
+          .getElementById("nomeDisciplina")
+          .value
+          .trim();
+
+        if (!nome) return;
+
+        try {
+
+          const resposta = await fetch(
+            `${API_URL}/disciplinas`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json"
+              },
+
+              body: JSON.stringify({
+                turma_id: turmaId,
+                nome
+              })
+            }
+          );
+
+          if (!resposta.ok) {
+            throw new Error("Erro ao criar disciplina");
+          }
+
+          document.getElementById("formDisciplina").reset();
+
+          bootstrap.Modal
+            .getInstance(document.getElementById("modalNovaDisciplina"))
+            .hide();
+
+          carregarDisciplinas();
+
+        } catch (erro) {
+
+          console.error(erro);
+
+          alert("Erro ao criar disciplina");
+        }
+      });
+
+    // BOTÃO DO ESTADO VAZIO
+    document
+      .getElementById("btnCriarPrimeira")
+      .addEventListener("click", () => {
+
+        const modal =
+          new bootstrap.Modal(
+            document.getElementById("modalNovaDisciplina")
+          );
+
+        modal.show();
+      });
+
+    carregarDisciplinas();
+  </script>
+
+</body>
+
+</html>

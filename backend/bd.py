@@ -21,7 +21,15 @@ _conexao: Optional[psycopg.Connection] = None
 
 def inicializar_banco() -> psycopg.Connection:
     global _conexao
-    _conexao = psycopg.connect(DB_URL, row_factory=dict_row)
+    _conexao = psycopg.connect(
+        DB_URL,
+        row_factory=dict_row,
+        connect_timeout=5,
+        keepalives=1,
+        keepalives_idle=30,
+        keepalives_interval=10,
+        keepalives_count=3,
+    )
     return _conexao
 
 
@@ -29,6 +37,14 @@ def get_conexao() -> psycopg.Connection:
     """Retorna a conexão ativa. Garante que o banco foi inicializado."""
     if _conexao is None or _conexao.closed:
         return inicializar_banco()
+
+    try:
+        with _conexao.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+    except (psycopg.OperationalError, psycopg.InterfaceError):
+        return inicializar_banco()
+
     return _conexao
 
 

@@ -15,7 +15,7 @@ VALID_SECONDS = int(os.environ.get("QR_VALID_SECONDS", 60))
 # No Render, defina: FRONTEND_URL=https://seu-projeto.vercel.app
 # ---------------------------------------------------------------------------
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://127.0.0.1:5500")
-PRESENCA_PATH = os.environ.get("PRESENCA_PATH", "/presenca.html")
+PRESENCA_PATH = os.environ.get("PRESENCA_PATH", "/Hackaton/frontend/presenca.html")
 
 
 def gerar_novo_qrcode_sala(
