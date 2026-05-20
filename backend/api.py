@@ -45,7 +45,7 @@ def registrar_presenca():
         return jsonify({"erro": "token é obrigatório"}), 400
 
     data_hoje = datetime.date.today()
-    agora = datetime.datetime.now()
+    agora = datetime.datetime.now(datetime.timezone.utc)
 
     conn = bd.get_conexao()
     cursor = conn.cursor()
@@ -80,7 +80,15 @@ def registrar_presenca():
     if utilizado:
         return jsonify({"erro": "Este QR Code já foi utilizado."}), 400
 
-    if agora > datetime.datetime.strptime(expira_em, "%Y-%m-%d %H:%M:%S"):
+    if isinstance(expira_em, str):
+        expira_em_dt = datetime.datetime.fromisoformat(expira_em)
+    else:
+        expira_em_dt = expira_em
+
+    if expira_em_dt.tzinfo is None:
+        expira_em_dt = expira_em_dt.replace(tzinfo=datetime.timezone.utc)
+
+    if agora > expira_em_dt:
         return jsonify(
             {"erro": "Este QR Code já expirou! Escaneie o novo código na tela."}
         ), 400

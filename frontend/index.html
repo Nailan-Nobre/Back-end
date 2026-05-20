@@ -1,587 +1,532 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hackaton - Painel</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --sidebar-width: 220px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hackaton - Painel</title>
 
-      body {
-        background-color: #f8f9fa;
-        font-family:
-          system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      }
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --sidebar-width: 220px;
+    }
 
-      .sidebar {
-        position: fixed;
-        inset: 0 auto 0 0;
-        width: var(--sidebar-width);
-        background: #0f1115;
-        color: #fff;
-        z-index: 1030;
-      }
+    body {
+      background-color: #f8f9fa;
+      font-family:
+        system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
 
-      .sidebar .nav-label {
-        white-space: nowrap;
-      }
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--sidebar-width);
+      background: #0f1115;
+      color: #fff;
+      z-index: 1030;
+    }
 
-      .sidebar .nav-link {
-        color: #cbd5e1;
-        border-radius: 12px;
-        margin: 4px 8px;
-        gap: 12px;
-      }
+    .sidebar .nav-label {
+      white-space: nowrap;
+    }
 
-      .sidebar .nav-link:hover,
-      .sidebar .nav-link.active {
-        background: #1f2937;
-        color: #fff;
-      }
+    .sidebar .nav-link {
+      color: #cbd5e1;
+      border-radius: 12px;
+      margin: 4px 8px;
+      gap: 12px;
+    }
 
-      .sidebar .brand {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 20px 12px 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      }
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background: #1f2937;
+      color: #fff;
+    }
 
-      .main-content {
-        margin-left: var(--sidebar-width);
-        min-height: 100vh;
-      }
+    .sidebar .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px 12px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-      .screen {
-        display: none;
-      }
+    .main-content {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+    }
 
-      .screen.active {
-        display: block;
-      }
+    .screen {
+      display: none;
+    }
 
-      /* Estilos específicos para a aba de Alunos */
-      .badge-matricula {
-        background: #eef2ff;
-        color: #1e3a8a;
-        font-weight: 500;
-        padding: 0.4rem 0.8rem;
-        border-radius: 40px;
-      }
+    .screen.active {
+      display: block;
+    }
 
-      .empty-state {
-        text-align: center;
-        padding: 2rem;
-        background: #ffffffcc;
-        border-radius: 1.5rem;
-      }
+    /* Estilos específicos para a aba de Alunos */
+    .badge-matricula {
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 40px;
+    }
 
-      .qr-info {
-        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-        border-radius: 1rem;
-      }
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      background: #ffffffcc;
+      border-radius: 1.5rem;
+    }
 
-      .btn-primary {
-        background: #2c3e66;
-        border: none;
-        border-radius: 2rem;
-        padding: 0.6rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.2s;
-      }
+    .qr-info {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      border-radius: 1rem;
+    }
 
-      .btn-primary:hover {
-        background: #1e2a4a;
-        transform: scale(0.98);
-      }
+    .btn-primary {
+      background: #2c3e66;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
 
-      .table-alunos th {
-        background: #f1f5f9;
-      }
+    .btn-primary:hover {
+      background: #1e2a4a;
+      transform: scale(0.98);
+    }
 
-      /* Ajustes nos cards para manter consistência */
-      .card {
-        border: none;
-        border-radius: 1.25rem;
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-      }
+    .table-alunos th {
+      background: #f1f5f9;
+    }
 
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1) !important;
-      }
-    </style>
-  </head>
+    /* Ajustes nos cards para manter consistência */
+    .card {
+      border: none;
+      border-radius: 1.25rem;
+      transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+    }
 
-  <body>
-    <aside class="sidebar d-flex flex-column">
-      <div class="brand">
-        <i class="fa-solid fa-laptop-code text-primary fs-4"></i>
-        <span class="nav-label fw-semibold">Hackaton</span>
-      </div>
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1) !important;
+    }
+  </style>
+</head>
 
-      <nav class="nav flex-column mt-2 px-1">
-        <a
-          class="nav-link d-flex align-items-center active"
-          href="#"
-          data-screen="historico"
-        >
-          <i class="fa fa-file-text fa-lg" style="color: #a78bfa"></i>
-          <span class="nav-label">Histórico</span>
-        </a>
-        <a class="nav-link d-flex align-items-center" href="#" data-screen="qr">
-          <i class="fa-solid fa-qrcode fa-lg text-success"></i>
-          <span class="nav-label">QR Presença</span>
-        </a>
-        <a
-          class="nav-link d-flex align-items-center"
-          href="#"
-          data-screen="bot"
-        >
-          <i class="fa-solid fa-robot fa-lg text-primary"></i>
-          <span class="nav-label">Bot</span>
-        </a>
-        <!-- NOVA ABA: ALUNOS -->
-        <a
-          class="nav-link d-flex align-items-center"
-          href="#"
-          data-screen="alunos"
-        >
-          <i class="fa-solid fa-user-graduate fa-lg text-info"></i>
-          <span class="nav-label">Alunos</span>
-        </a>
-      </nav>
-    </aside>
+<body>
+  <aside class="sidebar d-flex flex-column">
+    <div class="brand">
+      <i class="fa-solid fa-laptop-code text-primary fs-4"></i>
+      <span class="nav-label fw-semibold">Hackaton</span>
+    </div>
 
-    <main class="main-content">
-      <div class="container-fluid py-5 px-4 px-lg-5">
-        <!-- TELA HISTÓRICO (já existente) -->
-        <section id="screen-historico" class="screen">
-          <div class="mb-4">
-            <h1 class="fw-bold display-6 text-dark">Histórico de chamada</h1>
-            <p class="text-muted">
-              Pegue todas as listas de chamada desejadas.
+    <nav class="nav flex-column mt-2 px-1">
+      <a class="nav-link d-flex align-items-center active" href="#" data-screen="historico">
+        <i class="fa fa-file-text fa-lg" style="color: #a78bfa"></i>
+        <span class="nav-label">Histórico</span>
+      </a>
+      <a class="nav-link d-flex align-items-center" href="#" data-screen="qr">
+        <i class="fa-solid fa-qrcode fa-lg text-success"></i>
+        <span class="nav-label">QR Presença</span>
+      </a>
+      <a class="nav-link d-flex align-items-center" href="#" data-screen="bot">
+        <i class="fa-solid fa-robot fa-lg text-primary"></i>
+        <span class="nav-label">Bot</span>
+      </a>
+      <!-- NOVA ABA: ALUNOS -->
+      <a class="nav-link d-flex align-items-center" href="#" data-screen="alunos">
+        <i class="fa-solid fa-user-graduate fa-lg text-info"></i>
+        <span class="nav-label">Alunos</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="container-fluid py-5 px-4 px-lg-5">
+      <!-- TELA HISTÓRICO (já existente) -->
+      <section id="screen-historico" class="screen">
+        <div class="mb-4">
+          <h1 class="fw-bold display-6 text-dark">Histórico de chamada</h1>
+          <p class="text-muted">
+            Pegue todas as listas de chamada desejadas.
+          </p>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <p class="text-muted mb-0">
+              Em breve: listagem completa das chamadas realizadas.
             </p>
           </div>
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <p class="text-muted mb-0">
-                Em breve: listagem completa das chamadas realizadas.
-              </p>
-            </div>
-          </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- TELA QR PRESENÇA (já existente, mantida intacta) -->
-        <section id="screen-qr" class="screen">
-          <div class="mb-4">
-            <h1 class="fw-bold display-6 text-dark">Registrar presença</h1>
-            <p class="text-muted">
-              Crie códigos QR para registrar a presença de forma instantânea.
-            </p>
+      <!-- TELA QR PRESENÇA (já existente, mantida intacta) -->
+      <section id="screen-qr" class="screen">
+        <div class="mb-4">
+          <h1 class="fw-bold display-6 text-dark">Registrar presença</h1>
+          <p class="text-muted">
+            Crie códigos QR para registrar a presença de forma instantânea.
+          </p>
+        </div>
+        <div class="row g-4 align-items-start">
+          <div class="col-12 col-xl-5 text-center">
+            <img id="qr-image" alt="QR Code" class="img-fluid border rounded shadow-sm" style="max-width: 450px" />
           </div>
-          <div class="row g-4 align-items-start">
-            <div class="col-12 col-xl-5 text-center">
-              <img
-                id="qr-image"
-                alt="QR Code"
-                class="img-fluid border rounded shadow-sm"
-                style="max-width: 450px"
-              />
-            </div>
 
-            <div class="col-12 col-xl-7">
-              <div class="card shadow-sm">
-                <div class="card-body">
-                  <h2 class="h5 mb-3">Presenças registradas</h2>
-                  <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                      <thead class="table-light">
-                        <tr>
-                          <th scope="col">Nome</th>
-                          <th scope="col">Matrícula</th>
-                        </tr>
-                      </thead>
-                      <tbody id="presencas-body"></tbody>
-                    </table>
-                  </div>
-                  <div id="presencas-empty" class="text-muted small mt-3">
-                    Nenhuma presença registrada ainda.
-                  </div>
+          <div class="col-12 col-xl-7">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h2 class="h5 mb-3">Presenças registradas</h2>
+                <div class="table-responsive">
+                  <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Matrícula</th>
+                      </tr>
+                    </thead>
+                    <tbody id="presencas-body"></tbody>
+                  </table>
+                </div>
+                <div id="presencas-empty" class="text-muted small mt-3">
+                  Nenhuma presença registrada ainda.
                 </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <!-- TELA BOT (já existente) -->
-        <section id="screen-bot" class="screen">
-          <div class="mb-4">
-            <h1 class="fw-bold display-6 text-dark">Bot</h1>
-            <p class="text-muted">
-              Automatize o processo de registro de presença.
+      <!-- TELA BOT (já existente) -->
+      <section id="screen-bot" class="screen">
+        <div class="mb-4">
+          <h1 class="fw-bold display-6 text-dark">Bot</h1>
+          <p class="text-muted">
+            Automatize o processo de registro de presença.
+          </p>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <p class="text-muted mb-0">
+              Em breve: configurações e status do bot.
             </p>
           </div>
-          <div class="card border-0 shadow-sm">
-            <div class="card-body">
-              <p class="text-muted mb-0">
-                Em breve: configurações e status do bot.
-              </p>
+        </div>
+      </section>
+
+      <!-- ==================== NOVA TELA: ALUNOS (CADASTRO E LISTA) ==================== -->
+      <section id="screen-alunos" class="screen">
+        <div class="mb-4">
+          <h1 class="fw-bold display-6 text-dark">
+            <i class="fa-solid fa-user-graduate text-primary me-2"></i>Cadastro de Alunos
+          </h1>
+          <p class="text-muted">
+            Cadastre nome e matrícula. Os alunos poderão usar o QR Code
+            funcional para registrar presença.
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Coluna do formulário -->
+          <div class="col-12 col-lg-5">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
+                <h3 class="h5 mb-0 fw-semibold">
+                  <i class="fa-regular fa-id-card me-2 text-info"></i>Novo
+                  aluno
+                </h3>
+                <p class="text-muted small mt-1">
+                  Preencha os dados corretamente
+                </p>
+              </div>
+              <div class="card-body px-4 pb-4">
+                <form id="formCadastroAluno">
+                  <div class="mb-3">
+                    <label for="nomeAluno" class="form-label fw-medium">Nome completo</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-regular fa-user"></i></span>
+                      <input type="text" class="form-control" id="nomeAluno" name="nome"
+                        placeholder="Ex: Ana Beatriz Souza" required autocomplete="off" />
+                    </div>
+                    <div class="form-text">
+                      Nome que aparecerá nas listas de presença.
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="matriculaAluno" class="form-label fw-medium">Matrícula</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-hashtag"></i></span>
+                      <input type="text" class="form-control" id="matriculaAluno" placeholder="Ex: 20240001, RA12345"
+                        required autocomplete="off" />
+                    </div>
+                    <div class="form-text">
+                      Identificador único (evite duplicar matrícula).
+                    </div>
+                  </div>
+
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                      <i class="fa-regular fa-floppy-disk me-2"></i>Cadastrar
+                      aluno
+                    </button>
+                    <button type="button" id="btnLimparForm" class="btn btn-outline-secondary py-1">
+                      <i class="fa-regular fa-eraser me-1"></i>Limpar campos
+                    </button>
+                  </div>
+                </form>
+
+                <div class="alert alert-info mt-4 mb-0 small d-flex align-items-center gap-2 p-3 rounded-4"
+                  role="alert">
+                  <i class="fa-solid fa-circle-info fa-fw fs-5"></i>
+                  <span>Após cadastrar, o aluno pode acessar a aba
+                    <strong>“QR Presença”</strong>, escanear o código com o
+                    celular e registrar presença usando seus dados.</span>
+                </div>
+              </div>
             </div>
           </div>
-        </section>
 
-        <!-- ==================== NOVA TELA: ALUNOS (CADASTRO E LISTA) ==================== -->
-        <section id="screen-alunos" class="screen">
-          <div class="mb-4">
-            <h1 class="fw-bold display-6 text-dark">
-              <i class="fa-solid fa-user-graduate text-primary me-2"></i
-              >Cadastro de Alunos
-            </h1>
-            <p class="text-muted">
-              Cadastre nome e matrícula. Os alunos poderão usar o QR Code
-              funcional para registrar presença.
-            </p>
-          </div>
-
-          <div class="row g-4">
-            <!-- Coluna do formulário -->
-            <div class="col-12 col-lg-5">
-              <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-transparent border-0 pt-4 pb-0 px-4">
-                  <h3 class="h5 mb-0 fw-semibold">
-                    <i class="fa-regular fa-id-card me-2 text-info"></i>Novo
-                    aluno
+          <!-- Coluna da lista de alunos -->
+          <div class="col-12 col-lg-7">
+            <div class="card shadow-sm border-0">
+              <div
+                class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4">
+                <div>
+                  <h3 class="h5 fw-semibold mb-0">
+                    <i class="fa-solid fa-users me-2 text-primary"></i>Alunos
+                    registrados
                   </h3>
-                  <p class="text-muted small mt-1">
-                    Preencha os dados corretamente
-                  </p>
+                  <span class="small text-muted">Total: <span id="totalAlunosCount">0</span> alunos</span>
                 </div>
-                <div class="card-body px-4 pb-4">
-                  <form id="formCadastroAluno">
-                    <div class="mb-3">
-                      <label for="nomeAluno" class="form-label fw-medium"
-                        >Nome completo</label
-                      >
-                      <div class="input-group">
-                        <span class="input-group-text bg-light"
-                          ><i class="fa-regular fa-user"></i
-                        ></span>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="nomeAluno"
-                          name="nome"
-                          placeholder="Ex: Ana Beatriz Souza"
-                          required
-                          autocomplete="off"
-                        />
-                      </div>
-                      <div class="form-text">
-                        Nome que aparecerá nas listas de presença.
-                      </div>
-                    </div>
+                <button id="btnRemoverTodos" class="btn btn-sm btn-outline-danger rounded-pill mt-2 mt-sm-0">
+                  <i class="fa-regular fa-trash-can me-1"></i>Limpar tudo
+                </button>
+              </div>
+              <div class="card-body p-4 pt-2">
+                <div id="listaAlunosContainer" style="max-height: 460px; overflow-y: auto">
+                  <div id="emptyListMessage" class="empty-state text-muted">
+                    <i class="fa-regular fa-folder-open fa-3x mb-2 opacity-50"></i>
+                    <p class="mb-0">
+                      Nenhum aluno cadastrado ainda.<br />Use o formulário ao
+                      lado para registrar matrícula e nome.
+                    </p>
+                  </div>
+                  <table id="tabelaAlunos" class="table table-hover align-middle d-none">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th class="text-end">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody id="alunosTableBody"></tbody>
+                  </table>
+                </div>
 
-                    <div class="mb-4">
-                      <label for="matriculaAluno" class="form-label fw-medium"
-                        >Matrícula</label
-                      >
-                      <div class="input-group">
-                        <span class="input-group-text bg-light"
-                          ><i class="fa-solid fa-hashtag"></i
-                        ></span>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="matriculaAluno"
-                          placeholder="Ex: 20240001, RA12345"
-                          required
-                          autocomplete="off"
-                        />
-                      </div>
-                      <div class="form-text">
-                        Identificador único (evite duplicar matrícula).
-                      </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                      <button
-                        type="submit"
-                        class="btn btn-primary py-2 fw-semibold"
-                      >
-                        <i class="fa-regular fa-floppy-disk me-2"></i>Cadastrar
-                        aluno
-                      </button>
-                      <button
-                        type="button"
-                        id="btnLimparForm"
-                        class="btn btn-outline-secondary py-1"
-                      >
-                        <i class="fa-regular fa-eraser me-1"></i>Limpar campos
-                      </button>
-                    </div>
-                  </form>
-
-                  <div
-                    class="alert alert-info mt-4 mb-0 small d-flex align-items-center gap-2 p-3 rounded-4"
-                    role="alert"
-                  >
-                    <i class="fa-solid fa-circle-info fa-fw fs-5"></i>
-                    <span
-                      >Após cadastrar, o aluno pode acessar a aba
-                      <strong>“QR Presença”</strong>, escanear o código com o
-                      celular e registrar presença usando seus dados.</span
-                    >
+                <div class="mt-3 pt-2 border-top text-center qr-info p-3">
+                  <i class="fa-solid fa-mobile-screen-button text-success me-2 fs-5"></i>
+                  <span class="fw-medium">QR Code funcional:</span>
+                  <span class="small">O sistema de presença já está ativo e integrado ao
+                    backend. Alunos cadastrados aqui podem usar o QR na aba
+                    "QR Presença".</span>
+                  <div class="mt-2">
+                    <a href="#" id="linkParaQR" class="btn btn-sm btn-dark rounded-pill px-3">
+                      <i class="fa-solid fa-qrcode me-1"></i>Ir para QR
+                      Presença
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <!-- Coluna da lista de alunos -->
-            <div class="col-12 col-lg-7">
-              <div class="card shadow-sm border-0">
-                <div
-                  class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4"
-                >
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="card border-0 bg-white shadow-sm">
+              <div class="card-body py-3 px-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                   <div>
-                    <h3 class="h5 fw-semibold mb-0">
-                      <i class="fa-solid fa-users me-2 text-primary"></i>Alunos
-                      registrados
-                    </h3>
-                    <span class="small text-muted"
-                      >Total: <span id="totalAlunosCount">0</span> alunos</span
-                    >
+                    <i class="fa-regular fa-circle-check text-success me-2"></i>
+                    <strong class="me-1">Integração total:</strong>
+                    <span class="text-secondary small">Os alunos ficam salvos no seu navegador (localStorage).
+                      Quando usarem o QR Code funcional, a presença será
+                      registrada no backend normalmente.</span>
                   </div>
-                  <button
-                    id="btnRemoverTodos"
-                    class="btn btn-sm btn-outline-danger rounded-pill mt-2 mt-sm-0"
-                  >
-                    <i class="fa-regular fa-trash-can me-1"></i>Limpar tudo
-                  </button>
-                </div>
-                <div class="card-body p-4 pt-2">
-                  <div
-                    id="listaAlunosContainer"
-                    style="max-height: 460px; overflow-y: auto"
-                  >
-                    <div id="emptyListMessage" class="empty-state text-muted">
-                      <i
-                        class="fa-regular fa-folder-open fa-3x mb-2 opacity-50"
-                      ></i>
-                      <p class="mb-0">
-                        Nenhum aluno cadastrado ainda.<br />Use o formulário ao
-                        lado para registrar matrícula e nome.
-                      </p>
-                    </div>
-                    <table
-                      id="tabelaAlunos"
-                      class="table table-hover align-middle d-none"
-                    >
-                      <thead>
-                        <tr>
-                          <th>Nome</th>
-                          <th>Matrícula</th>
-                          <th class="text-end">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody id="alunosTableBody"></tbody>
-                    </table>
-                  </div>
-
-                  <div class="mt-3 pt-2 border-top text-center qr-info p-3">
-                    <i
-                      class="fa-solid fa-mobile-screen-button text-success me-2 fs-5"
-                    ></i>
-                    <span class="fw-medium">QR Code funcional:</span>
-                    <span class="small"
-                      >O sistema de presença já está ativo e integrado ao
-                      backend. Alunos cadastrados aqui podem usar o QR na aba
-                      "QR Presença".</span
-                    >
-                    <div class="mt-2">
-                      <a
-                        href="#"
-                        id="linkParaQR"
-                        class="btn btn-sm btn-dark rounded-pill px-3"
-                      >
-                        <i class="fa-solid fa-qrcode me-1"></i>Ir para QR
-                        Presença
-                      </a>
-                    </div>
-                  </div>
+                  <i class="fa-solid fa-qrcode fa-2x text-secondary opacity-50"></i>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+    </div>
 
-          <div class="row mt-4">
-            <div class="col-12">
-              <div class="card border-0 bg-white shadow-sm">
-                <div class="card-body py-3 px-4">
-                  <div
-                    class="d-flex flex-wrap align-items-center justify-content-between gap-2"
-                  >
-                    <div>
-                      <i
-                        class="fa-regular fa-circle-check text-success me-2"
-                      ></i>
-                      <strong class="me-1">Integração total:</strong>
-                      <span class="text-secondary small"
-                        >Os alunos ficam salvos no seu navegador (localStorage).
-                        Quando usarem o QR Code funcional, a presença será
-                        registrada no backend normalmente.</span
-                      >
-                    </div>
-                    <i
-                      class="fa-solid fa-qrcode fa-2x text-secondary opacity-50"
-                    ></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+    <footer class="text-center text-muted small py-4">
+      &copy; Desenvolvido para professores.
+    </footer>
+  </main>
 
-      <footer class="text-center text-muted small py-4">
-        &copy; Desenvolvido para professores.
-      </footer>
-    </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    // ======================= PARTE 1: QR CODE E PRESENÇAS (já existente) =======================
+    const navLinks = document.querySelectorAll("[data-screen]");
+    const screens = document.querySelectorAll(".screen");
+    const qrImage = document.getElementById("qr-image");
+    const presencasBody = document.getElementById("presencas-body");
+    const presencasEmpty = document.getElementById("presencas-empty");
+    let qrIntervalId = null;
+    let presencasIntervalId = null;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // ======================= PARTE 1: QR CODE E PRESENÇAS (já existente) =======================
-      const API_URL = "https://back-end-isvf.onrender.com";
-
-      const navLinks = document.querySelectorAll("[data-screen]");
-      const screens = document.querySelectorAll(".screen");
-      const qrImage = document.getElementById("qr-image");
-      const presencasBody = document.getElementById("presencas-body");
-      const presencasEmpty = document.getElementById("presencas-empty");
-
-      const setActiveScreen = (screenId) => {
-        screens.forEach((screen) => {
-          screen.classList.toggle("active", screen.id === `screen-${screenId}`);
-        });
-        navLinks.forEach((link) => {
-          link.classList.toggle("active", link.dataset.screen === screenId);
-        });
-      };
-
+    const setActiveScreen = (screenId) => {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === `screen-${screenId}`);
+      });
       navLinks.forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          setActiveScreen(link.dataset.screen);
-        });
+        link.classList.toggle("active", link.dataset.screen === screenId);
       });
 
-      // Funções do QR e presenças
-      const refreshQr = () => {
-        if (!qrImage) return;
-        qrImage.src = `${API_URL}/qr-code?t=${Date.now()}`;
-      };
-
-      const renderPresencas = (registros) => {
-        if (!presencasBody) return;
-        presencasBody.innerHTML = "";
-        if (!Array.isArray(registros) || registros.length === 0) {
-          presencasEmpty.classList.remove("d-none");
-          return;
+        if (screenId === "qr") {
+          startQrUpdates();
+          startPresencasUpdates();
+        } else {
+          stopQrUpdates();
+          stopPresencasUpdates();
         }
-        presencasEmpty.classList.add("d-none");
-        registros.forEach((registro) => {
-          const row = document.createElement("tr");
-          const nomeCell = document.createElement("td");
-          nomeCell.textContent = registro.nome || "";
-          const matriculaCell = document.createElement("td");
-          matriculaCell.textContent = registro.matricula || "";
-          row.appendChild(nomeCell);
-          row.appendChild(matriculaCell);
-          presencasBody.appendChild(row);
-        });
-      };
+    };
 
-      const refreshPresencas = async () => {
-        try {
-          const response = await fetch(`${API_URL}/presencas`);
-          if (!response.ok) throw new Error("Falha ao buscar presenças");
+    navLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        setActiveScreen(link.dataset.screen);
+      });
+    });
+
+    // Funções do QR e presenças
+    const refreshQr = () => {
+      if (!qrImage) return;
+      qrImage.src = `${API_URL}/qr-code?t=${Date.now()}`;
+    };
+
+    const renderPresencas = (registros) => {
+      if (!presencasBody) return;
+      presencasBody.innerHTML = "";
+      if (!Array.isArray(registros) || registros.length === 0) {
+        presencasEmpty.classList.remove("d-none");
+        return;
+      }
+      presencasEmpty.classList.add("d-none");
+      registros.forEach((registro) => {
+        const row = document.createElement("tr");
+        const nomeCell = document.createElement("td");
+        nomeCell.textContent = registro.nome || "";
+        const matriculaCell = document.createElement("td");
+        matriculaCell.textContent = registro.matricula || "";
+        row.appendChild(nomeCell);
+        row.appendChild(matriculaCell);
+        presencasBody.appendChild(row);
+      });
+    };
+
+    const refreshPresencas = async () => {
+      try {
+        const response = await fetch(`${API_URL}/presencas`);
+        if (!response.ok) throw new Error("Falha ao buscar presenças");
+        const data = await response.json();
+        renderPresencas(data.registros || []);
+      } catch (error) {
+        console.warn("Não foi possível carregar as presenças.");
+      }
+    };
+
+      const startQrUpdates = async () => {
+      let intervalMs = 60000;
+      try {
+        const response = await fetch(`${API_URL}/qr-config`);
+        if (response.ok) {
           const data = await response.json();
-          renderPresencas(data.registros || []);
-        } catch (error) {
-          console.warn("Não foi possível carregar as presenças.");
+          if (Number.isFinite(data.valid_seconds)) {
+            intervalMs = Math.max(1000, data.valid_seconds * 1000);
+          }
+        }
+      } catch (error) {
+        console.warn(
+          "Não foi possível obter configuração do QR. Usando padrão de 1 minuto.",
+        );
+      }
+      refreshQr();
+        if (qrIntervalId) clearInterval(qrIntervalId);
+        qrIntervalId = setInterval(refreshQr, intervalMs);
+      };
+
+      const stopQrUpdates = () => {
+        if (qrIntervalId) {
+          clearInterval(qrIntervalId);
+          qrIntervalId = null;
         }
       };
 
-      const startRefresh = async () => {
-        let intervalMs = 30000;
+      const startPresencasUpdates = () => {
+        refreshPresencas();
+        if (presencasIntervalId) clearInterval(presencasIntervalId);
+        presencasIntervalId = setInterval(refreshPresencas, 5000);
+      };
+
+      const stopPresencasUpdates = () => {
+        if (presencasIntervalId) {
+          clearInterval(presencasIntervalId);
+          presencasIntervalId = null;
+        }
+    };
+
+    // ======================= PARTE 2: CADASTRO DE ALUNOS (LOCALSTORAGE) =======================
+    const STORAGE_KEY = "hackaton_alunos";
+
+    function carregarAlunos() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
         try {
-          const response = await fetch(`${API_URL}/qr-config`);
-          if (response.ok) {
-            const data = await response.json();
-            if (Number.isFinite(data.valid_seconds)) {
-              intervalMs = Math.max(1000, data.valid_seconds * 1000);
-            }
-          }
-        } catch (error) {
-          console.warn(
-            "Não foi possível obter configuração do QR. Usando padrão de 30s.",
-          );
+          return JSON.parse(stored);
+        } catch (e) {
+          return [];
         }
-        refreshQr();
-        setInterval(refreshQr, intervalMs);
-      };
-
-      // ======================= PARTE 2: CADASTRO DE ALUNOS (LOCALSTORAGE) =======================
-      const STORAGE_KEY = "hackaton_alunos";
-
-      function carregarAlunos() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          try {
-            return JSON.parse(stored);
-          } catch (e) {
-            return [];
-          }
-        }
-        return [];
       }
+      return [];
+    }
 
-      function salvarAlunos(alunos) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
-        renderizarListaAlunos();
+    function salvarAlunos(alunos) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
+      renderizarListaAlunos();
+    }
+
+    function mostrarToast(mensagem, tipo = "success") {
+      let container = document.getElementById("dynamic-toast-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "dynamic-toast-container";
+        container.style.position = "fixed";
+        container.style.bottom = "20px";
+        container.style.right = "20px";
+        container.style.zIndex = "9999";
+        document.body.appendChild(container);
       }
-
-      function mostrarToast(mensagem, tipo = "success") {
-        let container = document.getElementById("dynamic-toast-container");
-        if (!container) {
-          container = document.createElement("div");
-          container.id = "dynamic-toast-container";
-          container.style.position = "fixed";
-          container.style.bottom = "20px";
-          container.style.right = "20px";
-          container.style.zIndex = "9999";
-          document.body.appendChild(container);
-        }
-        const toastEl = document.createElement("div");
-        toastEl.className = `toast align-items-center text-white bg-${tipo === "success" ? "success" : tipo === "danger" ? "danger" : tipo === "warning" ? "warning" : "secondary"} border-0 mb-2`;
-        toastEl.setAttribute("role", "alert");
-        toastEl.style.minWidth = "250px";
-        toastEl.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
-        toastEl.innerHTML = `
+      const toastEl = document.createElement("div");
+      toastEl.className = `toast align-items-center text-white bg-${tipo === "success" ? "success" : tipo === "danger" ? "danger" : tipo === "warning" ? "warning" : "secondary"} border-0 mb-2`;
+      toastEl.setAttribute("role", "alert");
+      toastEl.style.minWidth = "250px";
+      toastEl.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
+      toastEl.innerHTML = `
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="fa-regular fa-bell me-2"></i> ${mensagem}
@@ -589,211 +534,209 @@
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             `;
-        container.appendChild(toastEl);
-        const bsToast = new bootstrap.Toast(toastEl, {
-          delay: 3000,
-          autohide: true,
-        });
-        bsToast.show();
-        toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
-      }
-
-      function adicionarAluno(nome, matricula) {
-        if (!nome || !matricula) {
-          mostrarToast("Preencha nome e matrícula corretamente.", "warning");
-          return false;
-        }
-        const alunos = carregarAlunos();
-        const matriculaExistente = alunos.some(
-          (a) => a.matricula.toLowerCase() === matricula.trim().toLowerCase(),
-        );
-        if (matriculaExistente) {
-          mostrarToast(
-            `A matrícula "${matricula}" já está cadastrada.`,
-            "danger",
-          );
-          return false;
-        }
-        const novoAluno = {
-          id: Date.now() + Math.floor(Math.random() * 10000),
-          nome: nome.trim(),
-          matricula: matricula.trim(),
-          dataCadastro: new Date().toISOString(),
-        };
-        alunos.push(novoAluno);
-        salvarAlunos(alunos);
-        mostrarToast(
-          `Aluno ${novoAluno.nome} cadastrado com sucesso!`,
-          "success",
-        );
-        return true;
-      }
-
-      function removerAluno(id) {
-        let alunos = carregarAlunos();
-        const alunoRemovido = alunos.find((a) => a.id === id);
-        if (!alunoRemovido) return;
-        alunos = alunos.filter((aluno) => aluno.id !== id);
-        salvarAlunos(alunos);
-        mostrarToast(`Aluno ${alunoRemovido.nome} removido.`, "secondary");
-      }
-
-      function removerTodosAlunos() {
-        if (carregarAlunos().length === 0) {
-          mostrarToast("Nenhum aluno cadastrado para remover.", "info");
-          return;
-        }
-        if (
-          confirm(
-            "⚠️ Atenção: isso vai excluir TODOS os alunos cadastrados localmente. Deseja continuar?",
-          )
-        ) {
-          localStorage.removeItem(STORAGE_KEY);
-          renderizarListaAlunos();
-          mostrarToast(
-            "Todos os alunos foram removidos da lista local.",
-            "info",
-          );
-        }
-      }
-
-      function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function (m) {
-          if (m === "&") return "&amp;";
-          if (m === "<") return "&lt;";
-          if (m === ">") return "&gt;";
-          return m;
-        });
-      }
-
-      function renderizarListaAlunos() {
-        const alunos = carregarAlunos();
-        const tabela = document.getElementById("tabelaAlunos");
-        const tbody = document.getElementById("alunosTableBody");
-        const emptyDiv = document.getElementById("emptyListMessage");
-        const totalSpan = document.getElementById("totalAlunosCount");
-
-        if (totalSpan) totalSpan.innerText = alunos.length;
-
-        if (!alunos.length) {
-          if (emptyDiv) emptyDiv.classList.remove("d-none");
-          if (tabela) tabela.classList.add("d-none");
-          return;
-        }
-
-        if (emptyDiv) emptyDiv.classList.add("d-none");
-        if (tabela) tabela.classList.remove("d-none");
-        tbody.innerHTML = "";
-
-        alunos.forEach((aluno) => {
-          const tr = document.createElement("tr");
-          const tdNome = document.createElement("td");
-          tdNome.innerHTML = `<strong>${escapeHtml(aluno.nome)}</strong>`;
-          const tdMatricula = document.createElement("td");
-          tdMatricula.innerHTML = `<span class="badge-matricula">${escapeHtml(aluno.matricula)}</span>`;
-          const tdAcoes = document.createElement("td");
-          tdAcoes.className = "text-end";
-
-          const btnCopiar = document.createElement("button");
-          btnCopiar.className = "btn btn-sm btn-outline-info rounded-pill me-2";
-          btnCopiar.innerHTML = '<i class="fa-regular fa-copy"></i>';
-          btnCopiar.title = "Copiar nome e matrícula";
-          btnCopiar.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const dados = `${aluno.nome} | ${aluno.matricula}`;
-            navigator.clipboard
-              .writeText(dados)
-              .then(() => {
-                mostrarToast(
-                  "Dados copiados! Use no formulário de presença.",
-                  "success",
-                );
-              })
-              .catch(() => mostrarToast("Não foi possível copiar", "warning"));
-          });
-
-          const btnRemover = document.createElement("button");
-          btnRemover.className =
-            "btn btn-sm btn-outline-danger rounded-pill px-3";
-          btnRemover.innerHTML =
-            '<i class="fa-regular fa-trash-can me-1"></i>Remover';
-          btnRemover.addEventListener("click", (e) => {
-            e.stopPropagation();
-            removerAluno(aluno.id);
-          });
-
-          tdAcoes.appendChild(btnCopiar);
-          tdAcoes.appendChild(btnRemover);
-          tr.appendChild(tdNome);
-          tr.appendChild(tdMatricula);
-          tr.appendChild(tdAcoes);
-          tbody.appendChild(tr);
-        });
-      }
-
-      function limparFormulario() {
-        document.getElementById("nomeAluno").value = "";
-        document.getElementById("matriculaAluno").value = "";
-        document.getElementById("nomeAluno").focus();
-      }
-
-      // ======================= INICIALIZAÇÃO GERAL =======================
-      document.addEventListener("DOMContentLoaded", () => {
-        // Inicializa as telas (começa com histórico)
-        setActiveScreen("historico");
-        startRefresh();
-        refreshPresencas();
-        setInterval(refreshPresencas, 5000);
-
-        // Inicializa módulo de alunos
-        renderizarListaAlunos();
-
-        const form = document.getElementById("formCadastroAluno");
-        if (form) {
-          form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const nomeInput = document.getElementById("nomeAluno");
-            const matriculaInput = document.getElementById("matriculaAluno");
-            const nome = nomeInput.value.trim();
-            const matricula = matriculaInput.value.trim();
-            if (adicionarAluno(nome, matricula)) {
-              nomeInput.value = "";
-              matriculaInput.value = "";
-              nomeInput.focus();
-            }
-          });
-        }
-
-        const btnLimpar = document.getElementById("btnLimparForm");
-        if (btnLimpar) btnLimpar.addEventListener("click", limparFormulario);
-
-        const btnRemoverTodos = document.getElementById("btnRemoverTodos");
-        if (btnRemoverTodos)
-          btnRemoverTodos.addEventListener("click", removerTodosAlunos);
-
-        // Link interno "Ir para QR Presença" dentro da aba Alunos
-        const linkParaQR = document.getElementById("linkParaQR");
-        if (linkParaQR) {
-          linkParaQR.addEventListener("click", (e) => {
-            e.preventDefault();
-            setActiveScreen("qr");
-          });
-        }
-
-        // Pequena verificação de conectividade com backend (apenas console)
-        fetch(`${API_URL}/qr-config`, { method: "GET", cache: "no-cache" })
-          .then((res) =>
-            res.ok
-              ? console.log("✅ Backend online, QR funcional ativo.")
-              : null,
-          )
-          .catch(() =>
-            console.warn(
-              "⚠️ Backend offline? O QR ainda funcionará localmente, mas presenças podem não sincronizar.",
-            ),
-          );
+      container.appendChild(toastEl);
+      const bsToast = new bootstrap.Toast(toastEl, {
+        delay: 3000,
+        autohide: true,
       });
-    </script>
-  </body>
+      bsToast.show();
+      toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+    }
+
+    function adicionarAluno(nome, matricula) {
+      if (!nome || !matricula) {
+        mostrarToast("Preencha nome e matrícula corretamente.", "warning");
+        return false;
+      }
+      const alunos = carregarAlunos();
+      const matriculaExistente = alunos.some(
+        (a) => a.matricula.toLowerCase() === matricula.trim().toLowerCase(),
+      );
+      if (matriculaExistente) {
+        mostrarToast(
+          `A matrícula "${matricula}" já está cadastrada.`,
+          "danger",
+        );
+        return false;
+      }
+      const novoAluno = {
+        id: Date.now() + Math.floor(Math.random() * 10000),
+        nome: nome.trim(),
+        matricula: matricula.trim(),
+        dataCadastro: new Date().toISOString(),
+      };
+      alunos.push(novoAluno);
+      salvarAlunos(alunos);
+      mostrarToast(
+        `Aluno ${novoAluno.nome} cadastrado com sucesso!`,
+        "success",
+      );
+      return true;
+    }
+
+    function removerAluno(id) {
+      let alunos = carregarAlunos();
+      const alunoRemovido = alunos.find((a) => a.id === id);
+      if (!alunoRemovido) return;
+      alunos = alunos.filter((aluno) => aluno.id !== id);
+      salvarAlunos(alunos);
+      mostrarToast(`Aluno ${alunoRemovido.nome} removido.`, "secondary");
+    }
+
+    function removerTodosAlunos() {
+      if (carregarAlunos().length === 0) {
+        mostrarToast("Nenhum aluno cadastrado para remover.", "info");
+        return;
+      }
+      if (
+        confirm(
+          "⚠️ Atenção: isso vai excluir TODOS os alunos cadastrados localmente. Deseja continuar?",
+        )
+      ) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderizarListaAlunos();
+        mostrarToast(
+          "Todos os alunos foram removidos da lista local.",
+          "info",
+        );
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/[&<>]/g, function (m) {
+        if (m === "&") return "&amp;";
+        if (m === "<") return "&lt;";
+        if (m === ">") return "&gt;";
+        return m;
+      });
+    }
+
+    function renderizarListaAlunos() {
+      const alunos = carregarAlunos();
+      const tabela = document.getElementById("tabelaAlunos");
+      const tbody = document.getElementById("alunosTableBody");
+      const emptyDiv = document.getElementById("emptyListMessage");
+      const totalSpan = document.getElementById("totalAlunosCount");
+
+      if (totalSpan) totalSpan.innerText = alunos.length;
+
+      if (!alunos.length) {
+        if (emptyDiv) emptyDiv.classList.remove("d-none");
+        if (tabela) tabela.classList.add("d-none");
+        return;
+      }
+
+      if (emptyDiv) emptyDiv.classList.add("d-none");
+      if (tabela) tabela.classList.remove("d-none");
+      tbody.innerHTML = "";
+
+      alunos.forEach((aluno) => {
+        const tr = document.createElement("tr");
+        const tdNome = document.createElement("td");
+        tdNome.innerHTML = `<strong>${escapeHtml(aluno.nome)}</strong>`;
+        const tdMatricula = document.createElement("td");
+        tdMatricula.innerHTML = `<span class="badge-matricula">${escapeHtml(aluno.matricula)}</span>`;
+        const tdAcoes = document.createElement("td");
+        tdAcoes.className = "text-end";
+
+        const btnCopiar = document.createElement("button");
+        btnCopiar.className = "btn btn-sm btn-outline-info rounded-pill me-2";
+        btnCopiar.innerHTML = '<i class="fa-regular fa-copy"></i>';
+        btnCopiar.title = "Copiar nome e matrícula";
+        btnCopiar.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const dados = `${aluno.nome} | ${aluno.matricula}`;
+          navigator.clipboard
+            .writeText(dados)
+            .then(() => {
+              mostrarToast(
+                "Dados copiados! Use no formulário de presença.",
+                "success",
+              );
+            })
+            .catch(() => mostrarToast("Não foi possível copiar", "warning"));
+        });
+
+        const btnRemover = document.createElement("button");
+        btnRemover.className =
+          "btn btn-sm btn-outline-danger rounded-pill px-3";
+        btnRemover.innerHTML =
+          '<i class="fa-regular fa-trash-can me-1"></i>Remover';
+        btnRemover.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removerAluno(aluno.id);
+        });
+
+        tdAcoes.appendChild(btnCopiar);
+        tdAcoes.appendChild(btnRemover);
+        tr.appendChild(tdNome);
+        tr.appendChild(tdMatricula);
+        tr.appendChild(tdAcoes);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function limparFormulario() {
+      document.getElementById("nomeAluno").value = "";
+      document.getElementById("matriculaAluno").value = "";
+      document.getElementById("nomeAluno").focus();
+    }
+
+    // ======================= INICIALIZAÇÃO GERAL =======================
+    document.addEventListener("DOMContentLoaded", () => {
+      // Inicializa as telas (começa com histórico)
+      setActiveScreen("historico");
+
+      // Inicializa módulo de alunos
+      renderizarListaAlunos();
+
+      const form = document.getElementById("formCadastroAluno");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const nomeInput = document.getElementById("nomeAluno");
+          const matriculaInput = document.getElementById("matriculaAluno");
+          const nome = nomeInput.value.trim();
+          const matricula = matriculaInput.value.trim();
+          if (adicionarAluno(nome, matricula)) {
+            nomeInput.value = "";
+            matriculaInput.value = "";
+            nomeInput.focus();
+          }
+        });
+      }
+
+      const btnLimpar = document.getElementById("btnLimparForm");
+      if (btnLimpar) btnLimpar.addEventListener("click", limparFormulario);
+
+      const btnRemoverTodos = document.getElementById("btnRemoverTodos");
+      if (btnRemoverTodos)
+        btnRemoverTodos.addEventListener("click", removerTodosAlunos);
+
+      // Link interno "Ir para QR Presença" dentro da aba Alunos
+      const linkParaQR = document.getElementById("linkParaQR");
+      if (linkParaQR) {
+        linkParaQR.addEventListener("click", (e) => {
+          e.preventDefault();
+          setActiveScreen("qr");
+        });
+      }
+
+      // Pequena verificação de conectividade com backend (apenas console)
+      fetch(`${API_URL}/qr-config`, { method: "GET", cache: "no-cache" })
+        .then((res) =>
+          res.ok
+            ? console.log("✅ Backend online, QR funcional ativo.")
+            : null,
+        )
+        .catch(() =>
+          console.warn(
+            "⚠️ Backend offline? O QR ainda funcionará localmente, mas presenças podem não sincronizar.",
+          ),
+        );
+    });
+  </script>
+</body>
+
 </html>
