@@ -5,7 +5,7 @@
 ### 1. Clonar o Repositório
 
 ```bash
-git clone <https://github.com/scaua1675-ai/projetos.git>
+git clone <https://github.com/Nailan-Nobre/Back-end.git>
 ```
 
 ### 2. Criar o Ambiente Virtual
@@ -21,6 +21,8 @@ python -m venv .venv
 # Ativar o ambiente virtual
 .\.venv\Bin\Activate.ps1
 ```
+
+ps: . Certifique-se de iniciar o ambiente virtual usando a versão 3.12 do python
 
 #### No Windows (CMD):
 
