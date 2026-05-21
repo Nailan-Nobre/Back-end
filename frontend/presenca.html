@@ -66,15 +66,14 @@
         const form = document.getElementById('presenca-form');
         const btnRegistrar = document.getElementById('btn-registrar');
 
-        form.action = `${API_URL}/presenca`;
+        // CORREÇÃO: Não definir form.action, usar fetch diretamente
+        // form.action = `${API_URL}/presenca`;
 
         const irParaFeedback = (tipo, titulo, mensagem) => {
             const query = new URLSearchParams({
                 tipo,
                 titulo,
                 mensagem,
-                voltar: 'menu.html',
-                tempo: '3000',
             });
             if (token) query.set('turma_id', params.get('turma_id') || '');
             if (token) query.set('disciplina_id', params.get('disciplina_id') || '');
@@ -98,34 +97,43 @@
             const nome = document.getElementById('nome').value.trim();
             const matricula = document.getElementById('matricula').value.trim();
 
+            if (!nome || !matricula) {
+                irParaFeedback('erro', 'Campos obrigatórios', 'Preencha nome e matrícula.');
+                return;
+            }
+
             if (btnRegistrar) {
                 btnRegistrar.disabled = true;
                 btnRegistrar.textContent = 'Registrando...';
             }
 
             try {
-                const response = await fetch(form.action, {
+                // CORREÇÃO: Enviar para o endpoint correto
+                const response = await fetch(`${API_URL}/presenca`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        nome,
-                        matricula,
-                        token,
-                        turma_id: turmaIdInput.value,
-                        disciplina_id: disciplinaIdInput.value,
+                        nome: nome,
+                        matricula: matricula,
+                        token: token,
+                        turma_id: turmaIdInput.value || null,
+                        disciplina_id: disciplinaIdInput.value || null,
                     }),
                 });
 
-                const data = await response.json().catch(() => ({}));
+                const data = await response.json();
 
                 if (response.ok) {
                     irParaFeedback('sucesso', 'Presença registrada!', data.sucesso || 'Sua presença foi confirmada com sucesso.');
                     return;
                 }
 
-                irParaFeedback('erro', 'Não foi possível registrar', data.erro || 'Tente novamente com um QR Code válido.');
+                // Mostrar mensagem de erro específica
+                const mensagemErro = data.erro || data.detalhe || 'Tente novamente com um QR Code válido.';
+                irParaFeedback('erro', 'Não foi possível registrar', mensagemErro);
             } catch (error) {
-                irParaFeedback('erro', 'Erro de conexão', 'Não foi possível falar com o servidor.');
+                console.error('Erro ao registrar:', error);
+                irParaFeedback('erro', 'Erro de conexão', 'Não foi possível falar com o servidor. Verifique sua conexão.');
             } finally {
                 if (btnRegistrar) {
                     btnRegistrar.disabled = false;
@@ -140,56 +148,10 @@
         }
 
         body {
-            font-family:
-                system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-        }
-
-        .sidebar {
-            position: fixed;
-            inset: 0 auto 0 0;
-            width: var(--sidebar-width);
-            background: #0f1115;
-            color: #fff;
-            z-index: 1030;
-        }
-
-        .sidebar .nav-label {
-            white-space: nowrap;
-        }
-
-        .sidebar .nav-link {
-            color: #cbd5e1;
-            border-radius: 12px;
-            margin: 4px 8px;
-            gap: 12px;
-        }
-
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background: #1f2937;
-            color: #fff;
-        }
-
-        .sidebar .brand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 20px 12px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
+            font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
         }
 
         @media (max-width: 991.98px) {
-            .sidebar {
-                position: static;
-                width: 100%;
-            }
-
             .main-content {
                 margin-left: 0;
             }

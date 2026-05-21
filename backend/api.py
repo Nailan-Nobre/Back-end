@@ -33,7 +33,9 @@ def aplicar_cors_em_respostas(response):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Vary"] = "Origin"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, DELETE, OPTIONS"
+        )
     return response
 
 
@@ -63,17 +65,25 @@ def _obter_turma_id(cursor) -> int:
 
 @app.route("/presenca", methods=["POST", "OPTIONS"])
 def registrar_presenca():
+    # Para requisições OPTIONS (preflight CORS)
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
     payload = request.get_json(silent=True) or {}
-    form_data = request.form or {}
 
-    aluno_id = payload.get("aluno_id") or form_data.get("aluno_id")
-    matricula = payload.get("matricula") or form_data.get("matricula")
-    token_recebido = payload.get("token") or form_data.get("token")
-    turma_id = payload.get("turma_id") or form_data.get("turma_id")
-    disciplina_id = payload.get("disciplina_id") or form_data.get("disciplina_id")
+    # Extrair dados do payload
+    nome = payload.get("nome", "").strip()
+    matricula = payload.get("matricula", "").strip()
+    token_recebido = payload.get("token")
+    turma_id = payload.get("turma_id")
+    disciplina_id = payload.get("disciplina_id")
 
+    # Validações básicas
     if not token_recebido:
-        return jsonify({"erro": "token é obrigatório"}), 400
+        return jsonify({"erro": "Token é obrigatório"}), 400
+
+    if not nome or not matricula:
+        return jsonify({"erro": "Nome e matrícula são obrigatórios"}), 400
 
     data_hoje = datetime.date.today()
     agora = datetime.datetime.now(datetime.timezone.utc)
@@ -81,7 +91,6 @@ def registrar_presenca():
     conn = bd.get_conexao()
     cursor = conn.cursor()
 
-    # Normaliza e valida IDs que podem vir como strings vazias
     def _to_int_or_none(v):
         if v is None or (isinstance(v, str) and v.strip() == ""):
             return None
@@ -90,79 +99,136 @@ def registrar_presenca():
         except Exception:
             return None
 
-    aluno_id = _to_int_or_none(aluno_id)
-    turma_id = _to_int_or_none(turma_id)
-    disciplina_id = _to_int_or_none(disciplina_id)
-
-    if not aluno_id and matricula:
-        cursor.execute("SELECT id FROM alunos WHERE matricula = %s", (matricula,))
-        aluno = cursor.fetchone()
-        if not aluno:
-            return jsonify({"erro": "Matrícula não encontrada"}), 404
-        aluno_id = aluno["id"]
-
-    if not aluno_id:
-        return jsonify({"erro": "aluno_id ou matricula são obrigatórios"}), 400
-
-    # Se turma não foi fornecida, usa a turma padrão (criada/definida)
-    if turma_id is None:
-        turma_id = _obter_turma_id(cursor)
-
-    cursor.execute(
-        """
-        SELECT id FROM presencas
-        WHERE aluno_id = %s
-          AND data_aula = %s
-          AND turma_id = %s
-          AND disciplina_id = %s
-        """,
-        (aluno_id, data_hoje, turma_id, disciplina_id),
-    )
-    if cursor.fetchone():
-        return jsonify({"erro": "Você já registrou sua presença nesta chamada!"}), 400
-
-    cursor.execute(
-        "SELECT expira_em, utilizado FROM tokens_qrcode WHERE token_gerado = %s",
-        (token_recebido,),
-    )
-    resultado = cursor.fetchone()
-
-    if not resultado:
-        return jsonify({"erro": "QR Code inválido!"}), 400
-
-    expira_em = resultado["expira_em"]
-    utilizado = resultado["utilizado"]
-    if utilizado:
-        return jsonify({"erro": "Este QR Code já foi utilizado."}), 400
-
-    if isinstance(expira_em, str):
-        expira_em_dt = datetime.datetime.fromisoformat(expira_em)
-    else:
-        expira_em_dt = expira_em
-
-    if expira_em_dt.tzinfo is None:
-        expira_em_dt = expira_em_dt.replace(tzinfo=datetime.timezone.utc)
-
-    if agora > expira_em_dt:
-        return jsonify(
-            {"erro": "Este QR Code já expirou! Escaneie o novo código na tela."}
-        ), 400
+    turma_id_int = _to_int_or_none(turma_id)
+    disciplina_id_int = _to_int_or_none(disciplina_id)
 
     try:
+        # 1. Buscar o aluno pela matrícula
         cursor.execute(
-            "INSERT INTO presencas (aluno_id, turma_id, disciplina_id, data_aula) VALUES (%s, %s, %s, %s)",
-            (aluno_id, turma_id, disciplina_id, data_hoje),
+            "SELECT id, nome FROM alunos WHERE TRIM(matricula) = %s", (matricula,)
         )
+        aluno = cursor.fetchone()
+
+        if not aluno:
+            app.logger.warning(f"Aluno não encontrado com matrícula: {matricula}")
+            return jsonify(
+                {
+                    "erro": f"Matrícula '{matricula}' não encontrada. Verifique se você está cadastrado."
+                }
+            ), 404
+
+        aluno_id = aluno["id"]
+        aluno_nome = aluno["nome"]
+
+        # 2. Verificar se o nome informado corresponde ao nome cadastrado (opcional, mas recomendado)
+        if nome.lower() != aluno_nome.lower():
+            app.logger.warning(
+                f"Nome não corresponde: enviado='{nome}', cadastrado='{aluno_nome}'"
+            )
+            return jsonify(
+                {
+                    "erro": f"Nome informado não corresponde ao cadastrado para esta matrícula."
+                }
+            ), 400
+
+        # 3. Verificar token do QR Code
+        cursor.execute(
+            "SELECT expira_em, utilizado FROM tokens_qrcode WHERE token_gerado = %s",
+            (token_recebido,),
+        )
+        resultado = cursor.fetchone()
+
+        if not resultado:
+            return jsonify(
+                {"erro": "QR Code inválido! Escaneie o QR Code da tela do professor."}
+            ), 400
+
+        expira_em = resultado["expira_em"]
+        utilizado = resultado["utilizado"]
+
+        if utilizado:
+            return jsonify(
+                {"erro": "Este QR Code já foi utilizado. Escaneie um novo QR Code."}
+            ), 400
+
+        # Converter expira_em para datetime se for string
+        if isinstance(expira_em, str):
+            expira_em_dt = datetime.datetime.fromisoformat(expira_em)
+        else:
+            expira_em_dt = expira_em
+
+        if expira_em_dt.tzinfo is None:
+            expira_em_dt = expira_em_dt.replace(tzinfo=datetime.timezone.utc)
+
+        if agora > expira_em_dt:
+            return jsonify(
+                {"erro": "Este QR Code expirou! Peça ao professor para gerar um novo."}
+            ), 400
+
+        # 4. Se turma_id não foi fornecido, tentar buscar do token ou usar padrão
+        if turma_id_int is None:
+            # Buscar a turma do aluno (primeira turma associada)
+            cursor.execute(
+                """
+                SELECT turma_id FROM alunos_turmas 
+                WHERE aluno_id = %s 
+                LIMIT 1
+            """,
+                (aluno_id,),
+            )
+            turma_assoc = cursor.fetchone()
+            if turma_assoc:
+                turma_id_int = turma_assoc["turma_id"]
+            else:
+                turma_id_int = _obter_turma_id(cursor)
+
+        # 5. Verificar se o aluno já registrou presença hoje
+        cursor.execute(
+            """
+            SELECT id FROM presencas
+            WHERE aluno_id = %s
+              AND data_aula = %s
+              AND turma_id IS NOT DISTINCT FROM %s
+              AND disciplina_id IS NOT DISTINCT FROM %s
+            """,
+            (aluno_id, data_hoje, turma_id_int, disciplina_id_int),
+        )
+        if cursor.fetchone():
+            return jsonify(
+                {"erro": "Você já registrou sua presença nesta chamada hoje!"}
+            ), 400
+
+        # 6. Registrar presença
+        cursor.execute(
+            """
+            INSERT INTO presencas (aluno_id, turma_id, disciplina_id, data_aula, hora_registro)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (aluno_id, turma_id_int, disciplina_id_int, data_hoje, agora),
+        )
+
+        # 7. Marcar token como utilizado
         cursor.execute(
             "UPDATE tokens_qrcode SET utilizado = TRUE WHERE token_gerado = %s",
             (token_recebido,),
         )
+
         conn.commit()
-        return jsonify({"sucesso": "Presença registrada com sucesso!"}), 200
+
+        app.logger.info(
+            f"Presença registrada: Aluno {aluno_nome} ({matricula}) - Turma {turma_id_int}"
+        )
+
+        return jsonify(
+            {"sucesso": f"Presença registrada com sucesso! Bem-vindo(a), {aluno_nome}."}
+        ), 200
+
     except Exception as exc:
         conn.rollback()
-        app.logger.exception("Erro ao salvar no banco")
-        return jsonify({"erro": "Erro ao salvar no banco.", "detalhe": str(exc)}), 500
+        app.logger.exception("Erro ao registrar presença")
+        return jsonify(
+            {"erro": "Erro interno ao registrar presença.", "detalhe": str(exc)}
+        ), 500
 
 
 @app.route("/presencas", methods=["GET"])
@@ -187,7 +253,9 @@ def listar_presencas():
             SELECT a.nome, a.matricula, p.hora_registro, p.turma_id, p.disciplina_id
             FROM presencas p
             JOIN alunos a ON a.id = p.aluno_id
-            WHERE """ + " AND ".join(filtros) + """
+            WHERE """
+            + " AND ".join(filtros)
+            + """
             ORDER BY p.hora_registro DESC
             """,
             params,
@@ -210,14 +278,21 @@ def encerrar_chamada():
     disciplina_id_raw = payload.get("disciplina_id")
     turma_id_payload = payload.get("turma_id")
     try:
-        disciplina_id = None if disciplina_id_raw is None or (isinstance(disciplina_id_raw, str) and disciplina_id_raw.strip() == "") else int(disciplina_id_raw)
+        disciplina_id = (
+            None
+            if disciplina_id_raw is None
+            or (isinstance(disciplina_id_raw, str) and disciplina_id_raw.strip() == "")
+            else int(disciplina_id_raw)
+        )
     except Exception:
         disciplina_id = None
 
     conn = bd.get_conexao()
     cursor = conn.cursor()
     try:
-        turma_id = int(turma_id_payload) if turma_id_payload else _obter_turma_id(cursor)
+        turma_id = (
+            int(turma_id_payload) if turma_id_payload else _obter_turma_id(cursor)
+        )
         cursor.execute(
             """
             INSERT INTO listas_presenca (turma_id, data_aula, titulo, disciplina_id)
@@ -234,8 +309,8 @@ def encerrar_chamada():
             UPDATE presencas
             SET lista_id = %s
             WHERE data_aula = %s
-              AND turma_id = %s
-              AND disciplina_id = %s
+                            AND turma_id IS NOT DISTINCT FROM %s
+                            AND disciplina_id IS NOT DISTINCT FROM %s
               AND lista_id IS NULL
             """,
             (lista_id, data_hoje, turma_id, disciplina_id),
@@ -244,11 +319,15 @@ def encerrar_chamada():
 
         # Após encerrar, gerar novo token QR para próxima chamada
         try:
-            novo_token, _png = qr.gerar_novo_qrcode_sala(turma_id=turma_id, disciplina_id=disciplina_id)
+            novo_token, _png = qr.gerar_novo_qrcode_sala(
+                turma_id=turma_id, disciplina_id=disciplina_id
+            )
         except Exception:
             novo_token = None
 
-        return jsonify({"lista_id": lista_id, "titulo": titulo, "novo_token": novo_token}), 200
+        return jsonify(
+            {"lista_id": lista_id, "titulo": titulo, "novo_token": novo_token}
+        ), 200
     except Exception as exc:
         conn.rollback()
         app.logger.exception("Erro ao encerrar chamada")
@@ -355,12 +434,15 @@ def listar_presencas_da_lista(lista_id: int):
     cursor = conn.cursor()
     try:
         # Obter turma_id da lista
-        cursor.execute("SELECT turma_id, disciplina_id FROM listas_presenca WHERE id = %s", (lista_id,))
-        lista = cursor.fetchone()
+        cursor.execute(
+            "SELECT turma_id, disciplina_id FROM listas_presenca WHERE id = %s",
+            (lista_id,),
+        )
+        lista = dict(cursor.fetchone() or {})
         if not lista:
             return jsonify({"erro": "Lista não encontrada"}), 404
 
-        turma_id = lista.get("turma_id")
+        turma_id = lista["turma_id"]
 
         # Retorna todos os alunos vinculados à turma e marca presença quando houver registro na lista
         cursor.execute(
@@ -374,14 +456,16 @@ def listar_presencas_da_lista(lista_id: int):
             """,
             (lista_id, turma_id),
         )
-        registros = cursor.fetchall() or []
+        registros = [dict(registro) for registro in (cursor.fetchall() or [])]
         # Garantir que o campo 'presente' seja booleano no JSON
         for r in registros:
             r["presente"] = bool(r.get("presente"))
         return jsonify({"registros": registros}), 200
     except Exception as exc:
         app.logger.exception("Erro ao listar presencas da lista")
-        return jsonify({"erro": "Erro ao listar presencas da lista.", "detalhe": str(exc)}), 500
+        return jsonify(
+            {"erro": "Erro ao listar presencas da lista.", "detalhe": str(exc)}
+        ), 500
 
 
 @app.route("/alunos", methods=["GET"])
@@ -403,9 +487,7 @@ def listar_alunos():
             (turma_id,),
         )
     else:
-        cursor.execute(
-            "SELECT id, nome, matricula FROM alunos ORDER BY nome ASC"
-        )
+        cursor.execute("SELECT id, nome, matricula FROM alunos ORDER BY nome ASC")
 
     alunos = cursor.fetchall() or []
     return jsonify({"alunos": alunos}), 200
@@ -510,6 +592,7 @@ def criar_alunos_lote():
             jsonify({"erro": "Erro ao criar alunos em lote.", "detalhe": str(exc)}),
             500,
         )
+
 
 @app.route("/disciplinas/<int:turma_id>", methods=["GET"])
 def listar_disciplinas(turma_id: int):
