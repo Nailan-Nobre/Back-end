@@ -86,7 +86,7 @@
             <div class="row g-4 align-items-start">
                 <div class="col-12 col-lg-6 text-center">
                     <h1 class="h3 mb-2" id="qrTitulo">Escaneie o QR Code para registrar presença</h1>
-                    <p class="text-muted" id="qrSubtitulo">Atualiza automaticamente a cada minuto.</p>
+                    <p class="text-muted" id="qrSubtitulo">Atualiza automaticamente a cada 2 minutos.</p>
                     <div class="qr-frame mx-auto">
                         <div id="qr-loader"
                             class="qr-placeholder border rounded shadow-sm bg-white d-flex flex-column justify-content-center align-items-center">
@@ -167,8 +167,8 @@
 
         if (qrSubtitulo) {
             qrSubtitulo.textContent = disciplinaNome
-                ? `Turma: ${turmaNome}. Atualiza automaticamente a cada minuto.`
-                : 'Atualiza automaticamente a cada minuto.';
+                ? `Turma: ${turmaNome}. Atualiza automaticamente a cada 2 minutos.`
+                : 'Atualiza automaticamente a cada 2 minutos.';
         }
 
         const links = document.querySelectorAll('[data-route]');
@@ -280,7 +280,7 @@
         };
 
         const startRefresh = () => {
-            const intervalMs = 60000;
+            const intervalMs = 120000;
             refreshQr();
             setInterval(refreshQr, intervalMs);
         };

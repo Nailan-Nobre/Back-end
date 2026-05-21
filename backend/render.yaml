@@ -11,6 +11,6 @@ services:
       - key: DB_PATH
         value: /opt/render/project/src/controle_presenca.db
       - key: QR_VALID_SECONDS
-        value: "60"
+        value: "120"
       - key: PRESENCA_PATH
         value: /presenca.html

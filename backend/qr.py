@@ -8,7 +8,7 @@ import qrcode
 
 import bd
 
-VALID_SECONDS = int(os.environ.get("QR_VALID_SECONDS", 60))
+VALID_SECONDS = int(os.environ.get("QR_VALID_SECONDS", 120))
 
 # ---------------------------------------------------------------------------
 # URL base da página de presença — vem de variável de ambiente.
