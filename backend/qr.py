@@ -2,7 +2,7 @@ import secrets
 import datetime
 import io
 import os
-from typing import Any, Tuple
+from typing import Tuple
 
 import qrcode
 
@@ -30,23 +30,12 @@ def gerar_novo_qrcode_sala(
     conn = bd.get_conexao()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT id FROM tokens_qrcode ORDER BY id DESC LIMIT 1"
-    )
-    token_anterior: Any = cursor.fetchone()
-    cursor.execute(
         "INSERT INTO tokens_qrcode (token_gerado, expira_em) VALUES (%s, %s) RETURNING id",
         (token, expiracao),
     )
-    novo_token: Any = cursor.fetchone()
+    novo_token = cursor.fetchone()
     if not novo_token:
         raise RuntimeError("Nao foi possivel salvar o novo token do QR Code")
-    novo_token_id = novo_token["id"]  # type: ignore[index]
-    token_anterior_id = token_anterior["id"] if token_anterior else None  # type: ignore[index]
-    if token_anterior_id and token_anterior_id != novo_token_id:
-        cursor.execute(
-            "DELETE FROM tokens_qrcode WHERE id = %s",
-            (token_anterior_id,),
-        )
     conn.commit()
 
     # Monta a URL apontando para o frontend no Vercel (ou localhost em dev)

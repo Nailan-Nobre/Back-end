@@ -126,14 +126,12 @@ def registrar_presenca():
                 f"Nome não corresponde: enviado='{nome}', cadastrado='{aluno_nome}'"
             )
             return jsonify(
-                {
-                    "erro": f"Nome informado não corresponde ao cadastrado para esta matrícula."
-                }
+                {"erro": "Nome informado não corresponde ao cadastrado para esta matrícula."}
             ), 400
 
         # 3. Verificar token do QR Code
         cursor.execute(
-            "SELECT expira_em, utilizado FROM tokens_qrcode WHERE token_gerado = %s",
+            "SELECT expira_em FROM tokens_qrcode WHERE token_gerado = %s",
             (token_recebido,),
         )
         resultado = cursor.fetchone()
@@ -144,12 +142,6 @@ def registrar_presenca():
             ), 400
 
         expira_em = resultado["expira_em"]
-        utilizado = resultado["utilizado"]
-
-        if utilizado:
-            return jsonify(
-                {"erro": "Este QR Code já foi utilizado. Escaneie um novo QR Code."}
-            ), 400
 
         # Converter expira_em para datetime se for string
         if isinstance(expira_em, str):
@@ -205,12 +197,6 @@ def registrar_presenca():
             VALUES (%s, %s, %s, %s, %s)
             """,
             (aluno_id, turma_id_int, disciplina_id_int, data_hoje, agora),
-        )
-
-        # 7. Marcar token como utilizado
-        cursor.execute(
-            "UPDATE tokens_qrcode SET utilizado = TRUE WHERE token_gerado = %s",
-            (token_recebido,),
         )
 
         conn.commit()
