@@ -181,7 +181,7 @@
                 <p class="text-muted small mb-4">Gerencie as frequências, QR Codes e alunos matriculados nesta disciplina.</p>
                 
                 <div class="btn-visualizar-overlay">
-                  <a href="turma.html" class="btn btn-dark rounded-pill w-100 shadow">
+                  <a href="turma.html?turma_id=${encodeURIComponent(turma.id)}&turma_nome=${encodeURIComponent(turma.nome || "")}&turma_cor=${encodeURIComponent(cor)}" class="btn btn-dark rounded-pill w-100 shadow">
                     <i class="fa-solid fa-eye me-2"></i>Visualizar Turma
                   </a>
                 </div>

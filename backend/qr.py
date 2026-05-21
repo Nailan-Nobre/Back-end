@@ -2,7 +2,7 @@ import secrets
 import datetime
 import io
 import os
-from typing import Tuple
+from typing import Any, Tuple
 
 import qrcode
 
@@ -20,6 +20,8 @@ PRESENCA_PATH = os.environ.get("PRESENCA_PATH", "/Hackaton/frontend/presenca.htm
 
 def gerar_novo_qrcode_sala(
     valid_seconds: int = VALID_SECONDS,
+    turma_id: str | None = None,
+    disciplina_id: str | None = None,
 ) -> Tuple[str, bytes]:
     token = secrets.token_hex(16)
     agora = datetime.datetime.now(datetime.timezone.utc)
@@ -28,13 +30,32 @@ def gerar_novo_qrcode_sala(
     conn = bd.get_conexao()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO tokens_qrcode (token_gerado, expira_em) VALUES (%s, %s)",
-        (token, expiracao)
+        "SELECT id FROM tokens_qrcode ORDER BY id DESC LIMIT 1"
     )
+    token_anterior: Any = cursor.fetchone()
+    cursor.execute(
+        "INSERT INTO tokens_qrcode (token_gerado, expira_em) VALUES (%s, %s) RETURNING id",
+        (token, expiracao),
+    )
+    novo_token: Any = cursor.fetchone()
+    if not novo_token:
+        raise RuntimeError("Nao foi possivel salvar o novo token do QR Code")
+    novo_token_id = novo_token["id"]  # type: ignore[index]
+    token_anterior_id = token_anterior["id"] if token_anterior else None  # type: ignore[index]
+    if token_anterior_id and token_anterior_id != novo_token_id:
+        cursor.execute(
+            "DELETE FROM tokens_qrcode WHERE id = %s",
+            (token_anterior_id,),
+        )
     conn.commit()
 
     # Monta a URL apontando para o frontend no Vercel (ou localhost em dev)
-    url_presenca = f"{FRONTEND_URL}{PRESENCA_PATH}?token={token}"
+    query_params = [f"token={token}"]
+    if turma_id:
+        query_params.append(f"turma_id={turma_id}")
+    if disciplina_id:
+        query_params.append(f"disciplina_id={disciplina_id}")
+    url_presenca = f"{FRONTEND_URL}{PRESENCA_PATH}?{'&'.join(query_params)}"
 
     img = qrcode.make(url_presenca)
     bio = io.BytesIO()

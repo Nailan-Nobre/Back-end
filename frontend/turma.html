@@ -91,9 +91,9 @@
 
   <nav class="navbar navbar-dark navbar-custom shadow-sm">
     <div class="container">
-      <a href="index.html" class="navbar-brand fw-bold">
+      <a href="index.html" class="navbar-brand fw-bold" id="navTurmaNome">
         <i class="fa-solid fa-arrow-left me-2"></i>
-        Voltar
+        Hackaton
       </a>
     </div>
   </nav>
@@ -241,15 +241,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="config.js"></script>
 
   <script>
-    const API_URL = "http://127.0.0.1:5000";
 
     const params = new URLSearchParams(window.location.search);
 
-    const turmaId = params.get("id");
-    const turmaNome = params.get("nome") || "Turma";
-    const turmaCor = params.get("cor") || "#2c3e66";
+    const turmaId = params.get("turma_id") || params.get("id");
+    const turmaNomeParam = params.get("turma_nome") || "Turma";
+    const turmaCorParam = params.get("turma_cor") || "#2c3e66";
 
     const nomeTurma = document.getElementById("nomeTurma");
     const descricaoTurma = document.getElementById("descricaoTurma");
@@ -257,28 +257,53 @@
     const estadoVazio = document.getElementById("estado-vazio");
     const headerTurma = document.getElementById("headerTurma");
     const pageTitle = document.getElementById("pageTitle");
+    const navTurmaNome = document.getElementById("navTurmaNome");
 
-    // ALTERA TITULO DINAMICAMENTE
-    document.title = `${turmaNome} - Disciplinas`;
+    const turmaContexto = {
+      id: turmaId,
+      nome: turmaNomeParam,
+      cor: turmaCorParam,
+    };
 
-    // DEFINE DADOS DA TURMA
-    nomeTurma.textContent = turmaNome;
+    const atualizarCabecalho = (turma) => {
+      const nome = turma.nome || "Turma";
+      const cor = turma.cor || turmaContexto.cor || "#2c3e66";
 
-    descricaoTurma.textContent =
-      `Gerencie as disciplinas da ${turmaNome}`;
+      document.title = `${nome} - Disciplinas`;
+      nomeTurma.textContent = nome;
+      descricaoTurma.textContent = `Gerencie as disciplinas da ${nome}`;
+      headerTurma.style.background = cor;
+      if (navTurmaNome) {
+        navTurmaNome.innerHTML = `<i class="fa-solid fa-arrow-left me-2"></i>${nome}`;
+      }
 
-    headerTurma.style.background = turmaCor;
-
-    document.documentElement.style.setProperty(
-      "--cor-turma",
-      turmaCor
-    );
-
-    // ALTERA COR DO BOTÃO PRINCIPAL
-    document.querySelectorAll(".btn-primary")
-      .forEach(btn => {
-        btn.style.background = turmaCor;
+      document.documentElement.style.setProperty("--cor-turma", cor);
+      document.querySelectorAll(".btn-primary").forEach((btn) => {
+        btn.style.background = cor;
       });
+
+      turmaContexto.nome = nome;
+      turmaContexto.cor = cor;
+    };
+
+    atualizarCabecalho({
+      nome: turmaContexto.nome,
+      cor: turmaContexto.cor,
+    });
+
+    const carregarTurma = async () => {
+      if (!turmaId) return;
+      try {
+        const resposta = await fetch(`${API_URL}/turmas/${turmaId}`);
+        if (!resposta.ok) {
+          throw new Error("Turma nao encontrada");
+        }
+        const turma = await resposta.json();
+        atualizarCabecalho(turma);
+      } catch (erro) {
+        console.warn("Nao foi possivel carregar dados da turma.");
+      }
+    };
 
     async function carregarDisciplinas() {
 
@@ -288,7 +313,8 @@
           `${API_URL}/disciplinas/${turmaId}`
         );
 
-        const disciplinas = await resposta.json();
+        const data = await resposta.json();
+        const disciplinas = Array.isArray(data) ? data : data.disciplinas || [];
 
         container.innerHTML = "";
 
@@ -300,6 +326,15 @@
         estadoVazio.classList.add("d-none");
 
         disciplinas.forEach((disciplina) => {
+          const disciplinaParams = new URLSearchParams({
+            turma_id: turmaContexto.id || "",
+            turma_nome: turmaContexto.nome || "",
+            turma_cor: turmaContexto.cor || "",
+            disciplina_id: disciplina.id || "",
+            disciplina_nome: disciplina.nome || "",
+          });
+
+          const disciplinaUrl = `menu.html?${disciplinaParams.toString()}`;
 
           container.innerHTML += `
           
@@ -316,8 +351,8 @@
                       <div
                         class="disciplina-icon mb-3"
                         style="
-                          background: ${turmaCor}15;
-                          color: ${turmaCor};
+                          background: ${turmaContexto.cor}15;
+                          color: ${turmaContexto.cor};
                         ">
 
                         <i class="fa-solid fa-book"></i>
@@ -336,6 +371,12 @@
 
                   </div>
 
+                </div>
+
+                <div class="card-footer bg-transparent border-0 pt-0 pb-4 px-4">
+                  <a class="btn btn-primary w-100" href="${disciplinaUrl}">
+                    Entrar
+                  </a>
                 </div>
 
               </div>
@@ -415,6 +456,7 @@
       });
 
     carregarDisciplinas();
+    carregarTurma();
   </script>
 
 </body>

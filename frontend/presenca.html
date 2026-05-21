@@ -10,36 +10,7 @@
 </head>
 
 <body class="bg-light">
-    <aside class="sidebar d-flex flex-column">
-        <div class="brand">
-            <i class="fa-solid fa-laptop-code text-primary fs-4"></i>
-            <span class="nav-label fw-semibold">Hackaton</span>
-        </div>
-
-        <nav class="nav flex-column mt-2 px-1">
-            <a class="nav-link d-flex align-items-center" href="menu.html">
-                <i class="fa-solid fa-house fa-lg text-primary"></i>
-                <span class="nav-label">Inicio</span>
-            </a>
-            <a class="nav-link d-flex align-items-center" href="historico.html">
-                <i class="fa fa-file-text fa-lg" style="color: #a78bfa"></i>
-                <span class="nav-label">Historico</span>
-            </a>
-            <a class="nav-link d-flex align-items-center" href="qrCode.html">
-                <i class="fa-solid fa-qrcode fa-lg text-success"></i>
-                <span class="nav-label">QR Presenca</span>
-            </a>
-            <a class="nav-link d-flex align-items-center" href="sign_matricula.html">
-                <i class="fa-solid fa-user-graduate fa-lg text-info"></i>
-                <span class="nav-label">Alunos</span>
-            </a>
-        </nav>
-        <div class="mt-auto px-3 pb-3">
-            <a class="btn btn-outline-light w-100" href="index.html">
-                <i class="fa-solid fa-right-from-bracket me-2"></i>Voltar para Turmas
-            </a>
-        </div>
-    </aside>
+    
     <main class="main-content">
         <div class="container py-5">
         <div class="row justify-content-center">
@@ -58,6 +29,8 @@
                                 <input type="text" id="matricula" name="matricula" class="form-control" required>
                             </div>
                             <input type="hidden" id="token" name="token">
+                            <input type="hidden" id="turma_id" name="turma_id">
+                            <input type="hidden" id="disciplina_id" name="disciplina_id">
                             <div id="token-alert" class="alert alert-warning d-none" role="alert">
                                 Token ausente. Escaneie o QR Code novamente.
                             </div>
@@ -77,6 +50,8 @@
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
         const tokenInput = document.getElementById('token');
+        const turmaIdInput = document.getElementById('turma_id');
+        const disciplinaIdInput = document.getElementById('disciplina_id');
         const tokenAlert = document.getElementById('token-alert');
         const form = document.getElementById('presenca-form');
 
@@ -84,6 +59,8 @@
 
         if (token) {
             tokenInput.value = token;
+            turmaIdInput.value = params.get('turma_id') || '';
+            disciplinaIdInput.value = params.get('disciplina_id') || '';
         } else {
             tokenAlert.classList.remove('d-none');
             form.addEventListener('submit', (event) => {

@@ -149,24 +149,23 @@
 <body>
   <aside class="sidebar d-flex flex-column">
     <div class="brand">
-      <i class="fa-solid fa-laptop-code text-primary fs-4"></i>
-      <span class="nav-label fw-semibold">Hackaton</span>
+      <span class="nav-label fw-semibold" id="navTurmaNome">Hackaton</span>
     </div>
 
     <nav class="nav flex-column mt-2 px-1">
-      <a class="nav-link d-flex align-items-center" href="menu.html">
+      <a class="nav-link d-flex align-items-center" href="menu.html" data-route="menu.html">
         <i class="fa-solid fa-house fa-lg text-primary"></i>
         <span class="nav-label">Inicio</span>
       </a>
-      <a class="nav-link d-flex align-items-center" href="historico.html">
+      <a class="nav-link d-flex align-items-center" href="historico.html" data-route="historico.html">
         <i class="fa fa-file-text fa-lg" style="color: #a78bfa"></i>
         <span class="nav-label">Historico</span>
       </a>
-      <a class="nav-link d-flex align-items-center" href="qrCode.html">
+      <a class="nav-link d-flex align-items-center" href="qrCode.html" data-route="qrCode.html">
         <i class="fa-solid fa-qrcode fa-lg text-success"></i>
         <span class="nav-label">QR Presenca</span>
       </a>
-      <a class="nav-link d-flex align-items-center active" href="sign_matricula.html">
+      <a class="nav-link d-flex align-items-center active" href="sign_matricula.html" data-route="sign_matricula.html">
         <i class="fa-solid fa-user-graduate fa-lg text-info"></i>
         <span class="nav-label">Alunos</span>
       </a>
@@ -183,19 +182,14 @@
     <!-- Título da página -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
       <div>
-        <h1 class="display-6 fw-bold text-dark">
+        <h1 class="display-6 fw-bold text-dark" id="cadastroTitulo">
           <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Registrar
           aluno
         </h1>
-        <p class="text-muted">
+        <p class="text-muted" id="cadastroSubtitulo">
           Cadastre matrícula e nome do aluno. Depois ele poderá usar o
           <strong>QR Code</strong> para marcar presença.
         </p>
-      </div>
-      <div class="mt-2 mt-sm-0">
-        <a href="qrCode.html" class="btn btn-outline-primary rounded-pill">
-          <i class="fa-solid fa-qrcode me-2"></i>Ir para QR Code →
-        </a>
       </div>
     </div>
 
@@ -248,8 +242,8 @@
             <!-- Informação extra sobre QR Code funcional -->
             <div class="alert alert-info mt-4 mb-0 small d-flex align-items-center gap-2 p-3 rounded-4" role="alert">
               <i class="fa-solid fa-circle-info fa-fw fs-5"></i>
-              <span>Após cadastrar o aluno, ele pode acessar a página
-                <strong>“QR Presença”</strong>, escanear o
+              <span>Após cadastrar os alunos você pode acessar a página
+                <strong>“QR Presença”</strong>, os alunos podem escanear o
                 código com o celular e registrar presença utilizando seu nome
                 e matrícula. O sistema já grava os registros
                 automaticamente.</span>
@@ -260,6 +254,52 @@
 
       <!-- COLUDA DIREITA: LISTA DE ALUNOS CADASTRADOS + AÇÕES -->
       <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4">
+            <div>
+              <h3 class="h5 fw-semibold mb-0">
+                <i class="fa-solid fa-file-import me-2 text-primary"></i>Importar planilha
+              </h3>
+              <span class="small text-muted">A planilha deve ter apenas duas colunas: Nome e Matricula.</span>
+            </div>
+          </div>
+          <div class="card-body p-4 pt-2">
+            <div class="mb-3">
+              <input type="file" class="form-control" id="arquivoPlanilha" accept=".xlsx,.xls,.csv">
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                <div class="alert alert-warning py-2 px-3 small mb-3">
+                  Formato aceito: arquivo com duas colunas, <strong>Nome</strong> e <strong>Matricula</strong>.
+                  A primeira linha pode ser cabeçalho ou já o primeiro aluno.
+                </div>
+                <div class="small text-muted">Modelo da planilha</div>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="btnBaixarModelo">
+                  <i class="fa-solid fa-download me-2"></i>Baixar modelo CSV
+                </button>
+              </div>
+            </div>
+            <div id="previewContainer" class="d-none">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small text-muted">Preview (<span id="previewCount">0</span> alunos)</span>
+                <button id="btnCadastrarLote" class="btn btn-sm btn-primary">Cadastrar todos</button>
+              </div>
+              <div class="table-responsive" style="max-height: 280px; overflow-y: auto">
+                <table class="table table-sm table-striped align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Matrícula</th>
+                    </tr>
+                  </thead>
+                  <tbody id="previewBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="previewEmpty" class="text-muted small">Selecione uma planilha para visualizar o preview.</div>
+          </div>
+        </div>
+
         <div class="card shadow-sm border-0">
           <div
             class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap border-0 pt-4 px-4">
@@ -287,6 +327,7 @@
                   <tr>
                     <th>Nome</th>
                     <th>Matrícula</th>
+                  <div id="previewStatus" class="small text-muted mb-2"></div>
                     <th class="text-end">Ações</th>
                   </tr>
                 </thead>
@@ -300,99 +341,71 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
+  <script src="config.js"></script>
   <script>
-    // ======================= GERENCIAMENTO DE ALUNOS (LOCALSTORAGE) =======================
-    // Chave única para armazenar os alunos cadastrados
-    const STORAGE_KEY = "hackaton_alunos";
+    const params = new URLSearchParams(window.location.search);
+    const turmaNome = params.get("turma_nome") || "Hackaton";
+    const disciplinaNome = params.get("disciplina_nome") || "";
+    const turmaId = params.get("turma_id");
 
-    // Carregar alunos do localStorage
-    function carregarAlunos() {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch (e) {
-          return [];
-        }
-      }
-      return [];
+    const navTurmaNome = document.getElementById("navTurmaNome");
+    const cadastroTitulo = document.getElementById("cadastroTitulo");
+    const cadastroSubtitulo = document.getElementById("cadastroSubtitulo");
+
+    if (navTurmaNome) {
+      navTurmaNome.textContent = turmaNome;
     }
 
-    // Salvar array de alunos no localStorage
-    function salvarAlunos(alunos) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(alunos));
-      renderizarListaAlunos(); // atualiza UI
+    if (cadastroTitulo) {
+      cadastroTitulo.innerHTML = disciplinaNome
+        ? `Registrar aluno - ${disciplinaNome}`
+        : 'Registrar aluno';
     }
 
-    // Adicionar novo aluno (validação de duplicata por matrícula)
-    function adicionarAluno(nome, matricula) {
-      if (!nome || !matricula) {
-        mostrarToast("Preencha nome e matrícula corretamente.", "warning");
-        return false;
-      }
-
-      const alunos = carregarAlunos();
-      // Verificar se matrícula já existe (case sensitive, mas tratamos como string)
-      const matriculaExistente = alunos.some(
-        (aluno) =>
-          aluno.matricula.toLowerCase() === matricula.toLowerCase().trim(),
-      );
-      if (matriculaExistente) {
-        mostrarToast(
-          `A matrícula "${matricula}" já está cadastrada. Utilize uma única matrícula por aluno.`,
-          "danger",
-        );
-        return false;
-      }
-
-      const novoAluno = {
-        id: Date.now() + Math.floor(Math.random() * 10000),
-        nome: nome.trim(),
-        matricula: matricula.trim(),
-        dataCadastro: new Date().toISOString(),
-      };
-      alunos.push(novoAluno);
-      salvarAlunos(alunos);
-      mostrarToast(
-        `Aluno ${novoAluno.nome} cadastrado com sucesso!`,
-        "success",
-      );
-      return true;
+    if (cadastroSubtitulo) {
+      cadastroSubtitulo.textContent = disciplinaNome
+        ? `Turma: ${turmaNome}. Cadastre matrícula e nome do aluno.`
+        : "Cadastre matrícula e nome do aluno. Depois ele poderá usar o QR Code para marcar presença.";
     }
 
-    // Remover aluno por ID
-    function removerAluno(id) {
-      let alunos = carregarAlunos();
-      const alunoRemovido = alunos.find((a) => a.id === id);
-      if (!alunoRemovido) return;
-      alunos = alunos.filter((aluno) => aluno.id !== id);
-      salvarAlunos(alunos);
-      mostrarToast(`Aluno ${alunoRemovido.nome} removido.`, "secondary");
+    const links = document.querySelectorAll("[data-route]");
+    const query = params.toString();
+    links.forEach((link) => {
+      link.href = query ? `${link.dataset.route}?${query}` : link.dataset.route;
+    });
+
+    // ======================= GERENCIAMENTO DE ALUNOS (API) =======================
+    async function fetchAlunos() {
+      if (!turmaId) return [];
+      const response = await fetch(`${API_URL}/alunos?turma_id=${turmaId}`);
+      if (!response.ok) {
+        throw new Error("Falha ao buscar alunos");
+      }
+      const data = await response.json();
+      return data.alunos || [];
     }
 
-    // Remover todos os alunos
-    function removerTodosAlunos() {
-      if (carregarAlunos().length === 0) {
-        mostrarToast("Nenhum aluno cadastrado para remover.", "info");
-        return;
-      }
-      if (
-        confirm(
-          "⚠️ Atenção: isso vai excluir TODOS os alunos cadastrados localmente. Deseja continuar?",
-        )
-      ) {
-        localStorage.removeItem(STORAGE_KEY);
-        renderizarListaAlunos();
-        mostrarToast(
-          "Todos os alunos foram removidos da lista local.",
-          "info",
-        );
+    async function criarAluno(nome, matricula) {
+      const response = await fetch(`${API_URL}/alunos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome,
+          matricula,
+          turma_id: turmaId,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        const mensagem = data.erro || "Erro ao cadastrar aluno.";
+        throw new Error(mensagem);
       }
     }
 
     // ======================= RENDERIZAÇÃO DA LISTA DINÂMICA =======================
-    function renderizarListaAlunos() {
-      const alunos = carregarAlunos();
+    function renderizarListaAlunos(alunos) {
       const tabela = document.getElementById("tabelaAlunos");
       const tbody = document.getElementById("alunosTableBody");
       const emptyDiv = document.getElementById("emptyListMessage");
@@ -425,15 +438,6 @@
         // Coluna Ações (botões)
         const tdAcoes = document.createElement("td");
         tdAcoes.className = "text-end";
-        const btnRemover = document.createElement("button");
-        btnRemover.className =
-          "btn btn-sm btn-outline-danger rounded-pill px-3";
-        btnRemover.innerHTML =
-          '<i class="fa-regular fa-trash-can me-1"></i>Remover';
-        btnRemover.addEventListener("click", (e) => {
-          e.stopPropagation();
-          removerAluno(aluno.id);
-        });
         // Botão rápido para copiar dados para área de transferência (ajuda no preenchimento do QR)
         const btnCopiar = document.createElement("button");
         btnCopiar.className = "btn btn-sm btn-outline-info rounded-pill me-2";
@@ -453,12 +457,24 @@
             .catch(() => mostrarToast("Não foi possível copiar", "warning"));
         });
         tdAcoes.appendChild(btnCopiar);
-        tdAcoes.appendChild(btnRemover);
         tr.appendChild(tdNome);
         tr.appendChild(tdMatricula);
         tr.appendChild(tdAcoes);
         tbody.appendChild(tr);
       });
+    }
+
+    async function carregarListaAlunos() {
+      try {
+        if (!turmaId) {
+          renderizarListaAlunos([]);
+          return;
+        }
+        const alunos = await fetchAlunos();
+        renderizarListaAlunos(alunos);
+      } catch (error) {
+        renderizarListaAlunos([]);
+      }
     }
 
     // simples escape para evitar XSS
@@ -521,33 +537,232 @@
     }
 
     // ======================= EVENTOS E INICIALIZAÇÃO =======================
+    const arquivoPlanilha = document.getElementById("arquivoPlanilha");
+    const previewContainer = document.getElementById("previewContainer");
+    const previewBody = document.getElementById("previewBody");
+    const previewCount = document.getElementById("previewCount");
+    const previewEmpty = document.getElementById("previewEmpty");
+    const previewStatus = document.getElementById("previewStatus");
+    const btnCadastrarLote = document.getElementById("btnCadastrarLote");
+    const btnBaixarModelo = document.getElementById("btnBaixarModelo");
+    let alunosPreview = [];
+
+    const normalizarHeader = (valor) =>
+      (valor || "")
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+
+    const atualizarPreview = () => {
+      if (!previewBody || !previewCount || !previewContainer || !previewEmpty) return;
+
+      previewBody.innerHTML = "";
+
+      if (!alunosPreview.length) {
+        previewContainer.classList.add("d-none");
+        previewEmpty.classList.remove("d-none");
+        if (previewStatus) {
+          previewStatus.textContent = "Nenhum aluno válido foi encontrado na planilha.";
+        }
+        return;
+      }
+
+      alunosPreview.forEach((aluno) => {
+        const row = document.createElement("tr");
+        const nomeCell = document.createElement("td");
+        const matriculaCell = document.createElement("td");
+        nomeCell.textContent = aluno.nome;
+        matriculaCell.textContent = aluno.matricula;
+        row.appendChild(nomeCell);
+        row.appendChild(matriculaCell);
+        previewBody.appendChild(row);
+      });
+
+      previewCount.textContent = String(alunosPreview.length);
+      previewEmpty.classList.add("d-none");
+      previewContainer.classList.remove("d-none");
+      if (previewStatus) {
+        previewStatus.textContent = `Preview carregado com ${alunosPreview.length} aluno(s). Revise antes de cadastrar.`;
+      }
+    };
+
+    const processarPlanilha = async (file) => {
+      if (!file) return;
+
+      const nomeArquivo = (file.name || "").toLowerCase();
+      const extensao = nomeArquivo.split(".").pop();
+      const textoPermitido = ["csv", "xlsx", "xls"];
+      if (!textoPermitido.includes(extensao)) {
+        alunosPreview = [];
+        atualizarPreview();
+        throw new Error("Use apenas arquivos CSV, XLS ou XLSX.");
+      }
+
+      const buffer = await file.arrayBuffer();
+      let rows = [];
+
+      if (extensao === "csv") {
+        const texto = new TextDecoder("utf-8").decode(buffer).replace(/^\uFEFF/, "");
+        rows = texto
+          .split(/\r?\n/)
+          .map((linha) => linha.trim())
+          .filter(Boolean)
+          .map((linha) => linha.split(/;|,/).map((celula) => celula.trim().replace(/^"|"$/g, "")));
+      } else {
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+      }
+
+      if (!rows.length) {
+        alunosPreview = [];
+        atualizarPreview();
+        return;
+      }
+
+      const primeiro = rows[0] || [];
+      const headers = primeiro.map(normalizarHeader);
+      const idxNome = headers.indexOf("nome");
+      const idxMatricula = headers.indexOf("matricula");
+      const temHeader = idxNome !== -1 && idxMatricula !== -1;
+
+      const linhas = temHeader ? rows.slice(1) : rows;
+      alunosPreview = linhas
+        .map((linha) => {
+          const nome = (linha[temHeader ? idxNome : 0] || "").toString().trim();
+          const matricula = (linha[temHeader ? idxMatricula : 1] || "").toString().trim();
+          return { nome, matricula };
+        })
+        .filter((aluno) => aluno.nome && aluno.matricula);
+
+      if (!alunosPreview.length) {
+        throw new Error("A planilha nao contem linhas validas com nome e matricula.");
+      }
+
+      atualizarPreview();
+    };
+
+    const baixarModeloPlanilha = () => {
+      const conteudo = [
+        ["Nome", "Matricula"],
+        ["Maria Silva", "20240001"],
+        ["Joao Souza", "20240002"],
+      ]
+        .map((linha) => linha.join(","))
+        .join("\n");
+
+      const blob = new Blob([conteudo], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "modelo_alunos.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       // Renderizar lista existente
-      renderizarListaAlunos();
+      carregarListaAlunos();
 
       // Form submit
       const form = document.getElementById("formCadastroAluno");
       if (form) {
-        form.addEventListener("submit", (e) => {
+        form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const nomeInput = document.getElementById("nomeAluno");
           const matriculaInput = document.getElementById("matriculaAluno");
           const nome = nomeInput.value.trim();
           const matricula = matriculaInput.value.trim();
 
-          if (adicionarAluno(nome, matricula)) {
-            // Se cadastro bem sucedido, limpa formulário
+          if (!turmaId) {
+            mostrarToast("Selecione uma turma antes de cadastrar.", "warning");
+            return;
+          }
+
+          try {
+            await criarAluno(nome, matricula);
+            mostrarToast(`Aluno ${nome} cadastrado com sucesso!`, "success");
             nomeInput.value = "";
             matriculaInput.value = "";
             nomeInput.focus();
+            carregarListaAlunos();
+          } catch (error) {
+            mostrarToast(error.message || "Erro ao cadastrar aluno.", "danger");
           }
         });
       }
 
+      if (arquivoPlanilha) {
+        arquivoPlanilha.addEventListener("change", async (event) => {
+          const file = event.target.files && event.target.files[0];
+          try {
+            if (previewStatus) {
+              previewStatus.textContent = "Lendo planilha...";
+            }
+            await processarPlanilha(file);
+          } catch (error) {
+            alunosPreview = [];
+            atualizarPreview();
+            if (previewStatus) {
+              previewStatus.textContent = error.message || "Nao foi possivel ler a planilha.";
+            }
+            mostrarToast(error.message || "Nao foi possivel ler a planilha.", "danger");
+          }
+        });
+      }
+
+      if (btnCadastrarLote) {
+        btnCadastrarLote.addEventListener("click", async () => {
+          if (!turmaId) {
+            mostrarToast("Selecione uma turma antes de importar.", "warning");
+            return;
+          }
+
+          if (!alunosPreview.length) {
+            mostrarToast("Nenhum aluno para cadastrar.", "warning");
+            return;
+          }
+
+          try {
+            const response = await fetch(`${API_URL}/alunos/lote`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                turma_id: turmaId,
+                alunos: alunosPreview,
+              }),
+            });
+
+            if (!response.ok) {
+              const data = await response.json().catch(() => ({}));
+              throw new Error(data.erro || "Erro ao importar alunos.");
+            }
+
+            mostrarToast("Alunos importados com sucesso!", "success");
+            alunosPreview = [];
+            atualizarPreview();
+            if (arquivoPlanilha) {
+              arquivoPlanilha.value = "";
+            }
+            carregarListaAlunos();
+          } catch (error) {
+            mostrarToast(error.message || "Erro ao importar alunos.", "danger");
+          }
+        });
+      }
+
+      if (btnBaixarModelo) {
+        btnBaixarModelo.addEventListener("click", baixarModeloPlanilha);
+      }
+
       // Além disso, fornecer uma verificação de integridade com backend via console (sem interferência)
       // Pequena validação de rotas para o professor saber que o QR já está funcional:
-      const apiUrl = "https://back-end-isvf.onrender.com";
-      fetch(`${apiUrl}/qr-config`, { method: "GET", cache: "no-cache" })
+      fetch(`${API_URL}/qr-config`, { method: "GET", cache: "no-cache" })
         .then((res) =>
           res.ok
             ? console.log("✅ Backend online, QR funcional ativo.")
@@ -559,12 +774,6 @@
           ),
         );
 
-      // Dica: para facilitar a vida, pré-popular com dados de exemplo se estiver vazio? (opcional, sem poluir)
-      const alunosExistentes = carregarAlunos();
-      if (alunosExistentes.length === 0) {
-        // não adicionamos automaticamente para não poluir; apenas caso queira exemplo, mas deixamos vazio.
-        // O usuário fará cadastros manuais. Nenhum dado padrão invasivo.
-      }
     });
   </script>
 

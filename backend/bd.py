@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Any, Optional, cast
 
 from dotenv import load_dotenv
 import psycopg
@@ -21,9 +21,12 @@ _conexao: Optional[psycopg.Connection] = None
 
 def inicializar_banco() -> psycopg.Connection:
     global _conexao
+    db_url = DB_URL
+    if not db_url:
+        raise RuntimeError("DATABASE_URL ou SUPABASE_DB_URL nao configurado")
     _conexao = psycopg.connect(
-        DB_URL,
-        row_factory=dict_row,
+        db_url,
+        row_factory=cast(Any, dict_row),
         connect_timeout=5,
         keepalives=1,
         keepalives_idle=30,
@@ -42,7 +45,11 @@ def get_conexao() -> psycopg.Connection:
         with _conexao.cursor() as cursor:
             cursor.execute("SELECT 1")
             cursor.fetchone()
-    except (psycopg.OperationalError, psycopg.InterfaceError):
+    except (psycopg.OperationalError, psycopg.InterfaceError, psycopg.DatabaseError):
+        try:
+            _conexao.rollback()
+        except Exception:
+            pass
         return inicializar_banco()
 
     return _conexao
