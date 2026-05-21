@@ -5,42 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar presença</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body class="bg-light">
     
-    <main class="main-content">
+    <main class="main-content d-flex align-items-center">
         <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h1 class="h3 mb-3">Registrar presença</h1>
-                        <p class="text-muted mb-4">Preencha seus dados para confirmar a presença.</p>
-                        <form id="presenca-form" action="#" method="post">
-                            <div class="mb-3">
-                                <label for="nome" class="form-label">Nome</label>
-                                <input type="text" id="nome" name="nome" class="form-control" required>
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </div>
+                                <div>
+                                    <h1 class="h3 mb-1">Registrar presença</h1>
+                                    <p class="text-muted mb-0">Preencha seus dados para confirmar a presença.</p>
+                                </div>
                             </div>
-                            <div class="mb-4">
-                                <label for="matricula" class="form-label">Matrícula</label>
-                                <input type="text" id="matricula" name="matricula" class="form-control" required>
-                            </div>
-                            <input type="hidden" id="token" name="token">
-                            <input type="hidden" id="turma_id" name="turma_id">
-                            <input type="hidden" id="disciplina_id" name="disciplina_id">
-                            <div id="token-alert" class="alert alert-warning d-none" role="alert">
-                                Token ausente. Escaneie o QR Code novamente.
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Registrar</button>
-                        </form>
+
+                            <form id="presenca-form">
+                                <div class="mb-3">
+                                    <label for="nome" class="form-label">Nome</label>
+                                    <input type="text" id="nome" name="nome" class="form-control" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="matricula" class="form-label">Matrícula</label>
+                                    <input type="text" id="matricula" name="matricula" class="form-control" required>
+                                </div>
+                                <input type="hidden" id="token" name="token">
+                                <input type="hidden" id="turma_id" name="turma_id">
+                                <input type="hidden" id="disciplina_id" name="disciplina_id">
+                                <div id="token-alert" class="alert alert-warning d-none" role="alert">
+                                    Token ausente. Escaneie o QR Code novamente.
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="btn-registrar">
+                                    Registrar
+                                </button>
+                            </form>
+                        </div>
                     </div>
+                    <p class="text-center text-muted small mt-3 mb-0">Em caso de erro, contate a coordenação.</p>
                 </div>
-                <p class="text-center text-muted small mt-3 mb-0">Em caso de erro, contate a coordenação.</p>
             </div>
-        </div>
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -54,8 +64,22 @@
         const disciplinaIdInput = document.getElementById('disciplina_id');
         const tokenAlert = document.getElementById('token-alert');
         const form = document.getElementById('presenca-form');
+        const btnRegistrar = document.getElementById('btn-registrar');
 
         form.action = `${API_URL}/presenca`;
+
+        const irParaFeedback = (tipo, titulo, mensagem) => {
+            const query = new URLSearchParams({
+                tipo,
+                titulo,
+                mensagem,
+                voltar: 'menu.html',
+                tempo: '3000',
+            });
+            if (token) query.set('turma_id', params.get('turma_id') || '');
+            if (token) query.set('disciplina_id', params.get('disciplina_id') || '');
+            window.location.href = `feedback_presenca.html?${query.toString()}`;
+        };
 
         if (token) {
             tokenInput.value = token;
@@ -63,10 +87,52 @@
             disciplinaIdInput.value = params.get('disciplina_id') || '';
         } else {
             tokenAlert.classList.remove('d-none');
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-            });
+            form.addEventListener('submit', (event) => event.preventDefault());
+            if (btnRegistrar) btnRegistrar.disabled = true;
         }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!token) return;
+
+            const nome = document.getElementById('nome').value.trim();
+            const matricula = document.getElementById('matricula').value.trim();
+
+            if (btnRegistrar) {
+                btnRegistrar.disabled = true;
+                btnRegistrar.textContent = 'Registrando...';
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome,
+                        matricula,
+                        token,
+                        turma_id: turmaIdInput.value,
+                        disciplina_id: disciplinaIdInput.value,
+                    }),
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (response.ok) {
+                    irParaFeedback('sucesso', 'Presença registrada!', data.sucesso || 'Sua presença foi confirmada com sucesso.');
+                    return;
+                }
+
+                irParaFeedback('erro', 'Não foi possível registrar', data.erro || 'Tente novamente com um QR Code válido.');
+            } catch (error) {
+                irParaFeedback('erro', 'Erro de conexão', 'Não foi possível falar com o servidor.');
+            } finally {
+                if (btnRegistrar) {
+                    btnRegistrar.disabled = false;
+                    btnRegistrar.textContent = 'Registrar';
+                }
+            }
+        });
     </script>
     <style>
         :root {

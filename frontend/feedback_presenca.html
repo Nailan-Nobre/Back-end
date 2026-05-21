@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado da presença</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 35%),
+                linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+            font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        .result-card {
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .result-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-sucesso {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+        }
+
+        .status-erro {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+        }
+
+        .status-aviso {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        .muted-box {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card result-card">
+                    <div class="card-body p-4 p-md-5 text-center">
+                        <div id="resultIcon" class="result-icon mx-auto">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <h1 id="titulo" class="h3 fw-bold mb-3">Processando...</h1>
+                        <p id="mensagem" class="text-muted mb-4">Aguarde um instante.</p>
+
+                        <div class="muted-box p-3">
+                            <div class="small text-muted mb-1">Status</div>
+                            <div class="fw-semibold mb-0" id="statusTexto">Aguarde um instante.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const tipo = params.get('tipo') || 'sucesso';
+        const titulo = params.get('titulo') || (tipo === 'erro' ? 'Erro' : 'Sucesso');
+        const mensagem = params.get('mensagem') || '';
+        const statusTexto = document.getElementById('statusTexto');
+
+        const tituloEl = document.getElementById('titulo');
+        const mensagemEl = document.getElementById('mensagem');
+        const resultIcon = document.getElementById('resultIcon');
+
+        const configs = {
+            sucesso: {
+                icon: 'fa-circle-check',
+                iconHtml: '<i class="fa-solid fa-circle-check"></i>',
+                className: 'status-sucesso',
+            },
+            erro: {
+                icon: 'fa-triangle-exclamation',
+                iconHtml: '<i class="fa-solid fa-triangle-exclamation"></i>',
+                className: 'status-erro',
+            },
+        };
+
+        const config = configs[tipo] || configs.sucesso;
+        resultIcon.className = `result-icon mx-auto ${config.className}`;
+        resultIcon.innerHTML = config.iconHtml;
+        tituloEl.textContent = titulo;
+        mensagemEl.textContent = mensagem;
+        statusTexto.textContent = tipo === 'erro'
+            ? 'A operação não foi concluída.'
+            : 'A operação foi concluída com sucesso.';
+    </script>
+</body>
+</html>
