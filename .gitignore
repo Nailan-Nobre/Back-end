@@ -5,7 +5,6 @@ backend/schema.sql
 backend/.env
 backend/__pycache__/config.cpython-312.pyc
 backend/__pycache__/qr.cpython-312.pyc
-backend/seed.sql
 .vscode/settings.json
 backend/__pycache__/bd.cpython-310.pyc
 backend/__pycache__/qr.cpython-310.pyc

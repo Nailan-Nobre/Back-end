@@ -47,6 +47,22 @@
                 margin-left: 0;
             }
         }
+        /* Contador destacado */
+        .qr-timer {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #0d6efd;
+            color: #fff;
+            padding: 0.45rem 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 6px 18px rgba(13,110,253,0.15);
+        }
+        @media (max-width: 576px) {
+            .qr-timer { font-size: 0.95rem; padding: 0.35rem 0.6rem; }
+        }
     </style>
 </head>
 
@@ -87,6 +103,11 @@
                 <div class="col-12 col-lg-6 text-center">
                     <h1 class="h3 mb-2" id="qrTitulo">Escaneie o QR Code para registrar presença</h1>
                     <p class="text-muted" id="qrSubtitulo">Atualiza automaticamente a cada 2 minutos.</p>
+                    <div id="qr-timer" class="qr-timer mb-3" aria-live="polite">
+                        <i class="fa-solid fa-stopwatch" style="width:1em"></i>
+                        <span style="white-space:nowrap">Próximo QR:</span>
+                        <strong id="qr-timer-value" style="min-width:3ch; display:inline-block; text-align:center">02:00</strong>
+                    </div>
                     <div class="qr-frame mx-auto">
                         <div id="qr-loader"
                             class="qr-placeholder border rounded shadow-sm bg-white d-flex flex-column justify-content-center align-items-center">
@@ -133,6 +154,7 @@
     <script src="config.js"></script>
     <script>
         const qrImage = document.getElementById('qr-image');
+        const qrTimerValue = document.getElementById('qr-timer-value');
         const qrLoader = document.getElementById('qr-loader');
         const qrLoaderText = document.getElementById('qr-loader-text');
         const presencasBody = document.getElementById('presencas-body');
@@ -143,6 +165,21 @@
         const qrTitulo = document.getElementById('qrTitulo');
         const qrSubtitulo = document.getElementById('qrSubtitulo');
         let presencasStarted = false;
+        const QR_INTERVAL_MS = 120000; // 2 minutos
+        let nextQrRefresh = 0;
+
+        const formatMsToMMSS = (ms) => {
+            const totalSeconds = Math.ceil(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${seconds}`;
+        };
+
+        const updateQrTimer = () => {
+            if (!qrTimerValue) return;
+            const remaining = Math.max(0, nextQrRefresh - Date.now());
+            qrTimerValue.textContent = remaining > 0 ? formatMsToMMSS(remaining) : '00:00';
+        };
         const setEncerrarStatus = (message, tone) => {
             if (!encerrarStatus) return;
             encerrarStatus.textContent = message || '';
@@ -237,6 +274,9 @@
             if (disciplinaId) query.set('disciplina_id', disciplinaId);
             query.set('t', Date.now());
             qrImage.src = `${API_URL}/qr-code?${query.toString()}`;
+            // Reset timer for next refresh
+            nextQrRefresh = Date.now() + QR_INTERVAL_MS;
+            updateQrTimer();
         };
 
         const renderPresencas = (registros) => {
@@ -280,9 +320,11 @@
         };
 
         const startRefresh = () => {
-            const intervalMs = 120000;
+            const intervalMs = QR_INTERVAL_MS;
             refreshQr();
             setInterval(refreshQr, intervalMs);
+            // Atualiza o mostrador do timer a cada segundo
+            setInterval(updateQrTimer, 1000);
         };
 
         const startPresencas = () => {
